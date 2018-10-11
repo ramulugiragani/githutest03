@@ -127,6 +127,7 @@ struct PackageConfig {
   V(args_string, "args")                                                      \
   V(async, "async")                                                           \
   V(async_ids_stack_string, "async_ids_stack")                                \
+  V(broadcast_string, "broadcast")                                            \
   V(buffer_string, "buffer")                                                  \
   V(bytes_string, "bytes")                                                    \
   V(bytes_parsed_string, "bytesParsed")                                       \
