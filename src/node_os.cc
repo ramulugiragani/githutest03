@@ -237,6 +237,7 @@ static void GetInterfaceAddresses(const FunctionCallbackInfo<Value>& args) {
   int count, i;
   char ip[INET6_ADDRSTRLEN];
   char netmask[INET6_ADDRSTRLEN];
+  char broadcast[INET6_ADDRSTRLEN];
   char mac[18];
   Local<Object> ret, o;
   Local<String> name, family;
@@ -296,11 +297,24 @@ static void GetInterfaceAddresses(const FunctionCallbackInfo<Value>& args) {
       family = env->unknown_string();
     }
 
+    if (interfaces[i].broadcast.broadcast4.sin_family == AF_INET) {
+      uv_ip4_name(&interfaces[i].broadcast.broadcast4, broadcast,
+                   sizeof(broadcast));
+    } else if (interfaces[i].broadcast.broadcast4.sin_family == AF_INET6) {
+      uv_ip6_name(&interfaces[i].broadcast.broadcast6, broadcast,
+                  sizeof(broadcast));
+    } else {
+      broadcast[0] = '\0';
+    }
+
     o = Object::New(env->isolate());
     o->Set(env->address_string(), OneByteString(env->isolate(), ip));
     o->Set(env->netmask_string(), OneByteString(env->isolate(), netmask));
     o->Set(env->family_string(), family);
     o->Set(env->mac_string(), FIXED_ONE_BYTE_STRING(env->isolate(), mac));
+    if (broadcast[0]) {
+      o->Set(env->broadcast_string(), OneByteString(env->isolate(), broadcast));
+    }
 
     if (interfaces[i].address.address4.sin_family == AF_INET6) {
       uint32_t scopeid = interfaces[i].address.address6.sin6_scope_id;
@@ -451,6 +465,11 @@ void Initialize(Local<Object> target,
                 Local<Value> unused,
                 Local<Context> context) {
   Environment* env = Environment::GetCurrent(context);
+  const struct sockaddr_in6 allhosts_in6 = {
+    AF_INET6, 0, 0, IN6ADDR_ALLHOSTS_GROUP, 0,
+  };
+  static char allhosts_str[INET6_ADDRSTRLEN];
+
   env->SetMethod(target, "getHostname", GetHostname);
   env->SetMethod(target, "getLoadAvg", GetLoadAvg);
   env->SetMethod(target, "getUptime", GetUptime);
@@ -466,6 +485,10 @@ void Initialize(Local<Object> target,
   env->SetMethod(target, "getPriority", GetPriority);
   target->Set(FIXED_ONE_BYTE_STRING(env->isolate(), "isBigEndian"),
               Boolean::New(env->isolate(), IsBigEndian()));
+
+  uv_ip6_name(&allhosts_in6, allhosts_str, sizeof(allhosts_str));
+  NODE_DEFINE_STRING_CONSTANT(target, STRINGIFY_(IN6ADDR_ALLHOSTS_GROUP),
+                              allhosts_str);
 }
 
 }  // namespace os
