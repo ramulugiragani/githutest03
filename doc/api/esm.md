@@ -142,8 +142,10 @@ import _ from 'data:application/json,"world!"';
 * {Object}
 
 The `import.meta` metaproperty is an `Object` that contains the following
-property:
+properties:
 
+* `main` {boolean} `true` when the current module is the entry point of
+  the current process.
 * `url` {string} The absolute `file:` URL of the module.
 
 ## Differences between ES modules and CommonJS
@@ -177,6 +179,8 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 ```
+
+Equivalent of `require.main === module` is [`import.meta.main`][].
 
 ### No `require.resolve`
 
@@ -1163,6 +1167,7 @@ success!
 [`export`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export
 [`import()`]: #esm_import_expressions
 [`import.meta.url`]: #esm_import_meta
+[`import.meta.main`]: #esm_import_meta
 [`import`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import
 [`module.createRequire()`]: module.html#module_module_createrequire_filename
 [`module.syncBuiltinESMExports()`]: module.html#module_module_syncbuiltinesmexports
