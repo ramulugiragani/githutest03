@@ -17,6 +17,7 @@ exit /b 1
 
 :find-nasm
 set p=%~1
+:: Remove the last nine characters, which are "\nasm.exe"
 set p=%p:~0,-9%
 set "Path=%Path%;%p%"
 set p=
