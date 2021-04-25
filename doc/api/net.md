@@ -554,6 +554,9 @@ changes:
   * `allowHalfOpen` {boolean} Indicates whether half-opened TCP connections
     are allowed. See [`net.createServer()`][] and the [`'end'`][] event
     for details. **Default:** `false`.
+  * `noDelay` {boolean} A boolean with which to call [`socket.setNoDelay()`][]
+    when a socket connection is established. This only applies when the
+    underlying connection is a TCP socket.
   * `readable` {boolean} Allow reads on the socket when an `fd` is passed,
     otherwise ignored. **Default:** `false`.
   * `writable` {boolean} Allow writes on the socket when an `fd` is passed,
@@ -1439,6 +1442,7 @@ Returns `true` if input is a version 6 IP address, otherwise returns `false`.
 [`socket.pause()`]: #net_socket_pause
 [`socket.resume()`]: #net_socket_resume
 [`socket.setEncoding()`]: #net_socket_setencoding_encoding
+[`socket.setNoDelay()`]: #net_socket_setnodelay_nodelay
 [`socket.setTimeout()`]: #net_socket_settimeout_timeout_callback
 [`socket.setTimeout(timeout)`]: #net_socket_settimeout_timeout_callback
 [`writable.destroy()`]: stream.md#stream_writable_destroy_error
