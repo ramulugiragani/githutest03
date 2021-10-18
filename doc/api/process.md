@@ -2253,7 +2253,7 @@ console.log(memoryUsage.rss());
 // 35655680
 ```
 
-## `process.nextTick(callback[, ...args])`
+## `process.nextTick([callback][, ...args])`
 <!-- YAML
 added: v0.1.26
 changes:
@@ -2264,6 +2264,7 @@ changes:
 
 * `callback` {Function}
 * `...args` {any} Additional arguments to pass when invoking the `callback`
+* Returns: {Promise} containing {undefined} if no `callback` provided
 
 `process.nextTick()` adds `callback` to the "next tick queue". This queue is
 fully drained after the current operation on the JavaScript stack runs to
@@ -2297,6 +2298,20 @@ console.log('scheduled');
 // start
 // scheduled
 // nextTick callback
+```
+
+If no `callback` function is provided, a `Promise` will be returned.
+
+```js
+async function output() {
+  await process.nextTick();
+  console.log('scheduled');
+}
+output();
+console.log('immediately');
+// Output:
+// immediately
+// scheduled
 ```
 
 This is important when developing APIs in order to give users the opportunity
