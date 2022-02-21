@@ -323,5 +323,6 @@ module.exports = {
     FormData: 'readable',
     Response: 'readable',
     SubtleCrypto: 'readable',
+    reportError: 'readable',
   },
 };

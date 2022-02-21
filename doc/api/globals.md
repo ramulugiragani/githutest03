@@ -660,6 +660,23 @@ The object that acts as the namespace for all W3C
 [Mozilla Developer Network][webassembly-mdn] for usage and compatibility.
 
 [Web Crypto API]: webcrypto.md
+## `reportError(error)`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1 - Experimental.
+
+<!-- type=global -->
+
+* `error` {Error|any} an error to report.
+
+The `reportError(error)` method triggers an uncaught exception with the error
+`error`. This will crash the Node.js process by default.
+
+It is based on the [`reportError`][] web standard.
+
 [`--experimental-fetch`]: cli.md#--experimental-fetch
 [`--experimental-global-webcrypto`]: cli.md#--experimental-global-webcrypto
 [`AbortController`]: https://developer.mozilla.org/en-US/docs/Web/API/AbortController
@@ -686,6 +703,7 @@ The object that acts as the namespace for all W3C
 [`perf_hooks.performance`]: perf_hooks.md#perf_hooksperformance
 [`process.nextTick()`]: process.md#processnexttickcallback-args
 [`process` object]: process.md#process
+[`reportError`]: https://developer.mozilla.org/en-US/docs/Web/API/reportError
 [`require()`]: modules.md#requireid
 [`setImmediate`]: timers.md#setimmediatecallback-args
 [`setInterval`]: timers.md#setintervalcallback-delay-args
