@@ -100,23 +100,46 @@ function test(environ, shouldWrite, section, forceColors = false) {
   });
 
   child.on('close', common.mustCall((c) => {
-    assert(!c);
-    assert.strictEqual(err, expectErr);
-    assert.strictEqual(out, expectOut);
-    // Run the test again, this time with colors enabled.
-    if (!forceColors) {
-      test(environ, shouldWrite, section, true);
+    try {
+      assert(!c);
+      assert.strictEqual(err, expectErr);
+      assert.strictEqual(out, expectOut);
+      // Run the test again, this time with colors enabled.
+      if (!forceColors) {
+        test(environ, shouldWrite, section, true);
+      }
+    } catch (e) {
+      console.error('FAILED PERMUTATION:', { environ, shouldWrite, section, forceColors });
+      console.error('COMMAND:', Object.entries({
+        NODE_DEBUG: environ,
+        FORCE_COLOR: forceColors ? 'true' : ''
+      }).reduce(
+        (acc, [k, v]) => { acc.push(`${k}=${JSON.stringify(v)}`); return acc; },
+        []
+      ).join(' '), 'node', [__filename, 'child', JSON.stringify(section)].join(' '));
+      throw e;
     }
   }));
 }
 
-
 function child(section) {
   const tty = require('tty');
   // Make sure we check for colors, no matter of the stream's default.
+
+  const forceColors = process.env.FORCE_COLOR === 'true';
   Object.defineProperty(process.stderr, 'hasColors', {
     value: tty.WriteStream.prototype.hasColors
   });
+  Object.defineProperty(process.stderr, 'isTTY', {
+    value: forceColors,
+  });
+  Object.defineProperty(process.stdout, 'hasColors', {
+    value: tty.WriteStream.prototype.hasColors
+  });
+  Object.defineProperty(process.stdout, 'isTTY', {
+    value: forceColors,
+  });
+
   // eslint-disable-next-line no-restricted-syntax
   const debug = util.debuglog(section, common.mustCall((cb) => {
     assert.strictEqual(typeof cb, 'function');
