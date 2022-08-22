@@ -98,6 +98,7 @@ expected.beforePreExec = new Set([
   'NativeModule internal/modules/package_json_reader',
   'Internal Binding module_wrap',
   'NativeModule internal/modules/cjs/loader',
+  'NativeModule diagnostics_channel'
 ]);
 
 expected.atRunTime = new Set([
