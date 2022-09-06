@@ -3,10 +3,10 @@
 #define NODE_OPENSSL_SYSTEM_CERT_PATH "/missing/ca.pem"
 
 #include "crypto/crypto_context.h"
-#include "node_options.h"
-#include "openssl/err.h"
 #include "gtest/gtest.h"
+#include "node_options.h"
 #include "node_test_fixture.h"
+#include "openssl/err.h"
 
 class NodeCryptoTest : public EnvironmentTestFixture {};
 

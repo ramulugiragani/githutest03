@@ -1,8 +1,8 @@
 #include "crypto/crypto_context.h"
+#include "base_object-inl.h"
 #include "crypto/crypto_bio.h"
 #include "crypto/crypto_common.h"
 #include "crypto/crypto_util.h"
-#include "base_object-inl.h"
 #include "env-inl.h"
 #include "memory_tracker-inl.h"
 #include "node.h"
@@ -195,11 +195,10 @@ unsigned long LoadCertsFromFile(  // NOLINT(runtime/int)
   ClearErrorOnReturn clear_error_on_return;
 
   BIOPointer bio(BIO_new_file(file, "r"));
-  if (!bio)
-    return ERR_get_error();
+  if (!bio) return ERR_get_error();
 
-  while (X509* x509 =
-      PEM_read_bio_X509(bio.get(), nullptr, NoPasswordCallback, nullptr)) {
+  while (X509* x509 = PEM_read_bio_X509(
+             bio.get(), nullptr, NoPasswordCallback, nullptr)) {
     certs->push_back(x509);
   }
 
@@ -218,18 +217,17 @@ unsigned long LoadCertsFromFile(  // NOLINT(runtime/int)
 X509_STORE* NewRootCertStore(Environment* env) {
   static std::vector<X509*> root_certs_vector;
   static bool root_certs_vector_loaded = false;
-  static Mutex root_certs_vector_mutex;  
+  static Mutex root_certs_vector_mutex;
   Mutex::ScopedLock lock(root_certs_vector_mutex);
 
   if (!root_certs_vector_loaded) {
     if (per_process::cli_options->ssl_openssl_cert_store == false) {
       for (size_t i = 0; i < arraysize(root_certs); i++) {
-        X509* x509 =
-            PEM_read_bio_X509(NodeBIO::NewFixed(root_certs[i],
-                                                strlen(root_certs[i])).get(),
-                              nullptr,   // no re-use of X509 structure
-                              NoPasswordCallback,
-                              nullptr);  // no callback data
+        X509* x509 = PEM_read_bio_X509(
+            NodeBIO::NewFixed(root_certs[i], strlen(root_certs[i])).get(),
+            nullptr,   // no re-use of X509 structure
+            NoPasswordCallback,
+            nullptr);  // no callback data
 
         // Parse errors from the built-in roots are fatal.
         CHECK_NOT_NULL(x509);
@@ -240,14 +238,13 @@ X509_STORE* NewRootCertStore(Environment* env) {
 
     if (!extra_root_certs_file.empty()) {
       unsigned long err = LoadCertsFromFile(  // NOLINT(runtime/int)
-                                          &root_certs_vector,
-                                          extra_root_certs_file.c_str());
+          &root_certs_vector,
+          extra_root_certs_file.c_str());
       if (err) {
-        ProcessEmitWarning(
-          env,
-          "Ignoring extra certs from `%s`, load failed: %s\n",
-          extra_root_certs_file.c_str(),
-          ERR_error_string(err, nullptr));
+        ProcessEmitWarning(env,
+                           "Ignoring extra certs from `%s`, load failed: %s\n",
+                           extra_root_certs_file.c_str(),
+                           ERR_error_string(err, nullptr));
       }
     }
 
@@ -783,7 +780,7 @@ void SecureContext::AddRootCerts(const FunctionCallbackInfo<Value>& args) {
   ClearErrorOnReturn clear_error_on_return;
 
   if (root_cert_store == nullptr) {
-    Environment* env = Environment::GetCurrent(args);    
+    Environment* env = Environment::GetCurrent(args);
     root_cert_store = NewRootCertStore(env);
   }
 
