@@ -225,7 +225,7 @@ X509_STORE* NewRootCertStore(Environment* env) {
       for (size_t i = 0; i < arraysize(root_certs); i++) {
         X509* x509 = PEM_read_bio_X509(
             NodeBIO::NewFixed(root_certs[i], strlen(root_certs[i])).get(),
-            nullptr,   // no re-use of X509 structure
+            nullptr,  // no re-use of X509 structure
             NoPasswordCallback,
             nullptr);  // no callback data
 
