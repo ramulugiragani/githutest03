@@ -3,12 +3,9 @@
 #define NODE_OPENSSL_SYSTEM_CERT_PATH "/missing/ca.pem"
 
 #include "crypto/crypto_context.h"
-#include "gtest/gtest.h"
 #include "node_options.h"
-#include "node_test_fixture.h"
 #include "openssl/err.h"
-
-class NodeCryptoTest : public EnvironmentTestFixture {};
+#include "gtest/gtest.h"
 
 /*
  * This test verifies that a call to NewRootCertDir with the build time
@@ -16,17 +13,9 @@ class NodeCryptoTest : public EnvironmentTestFixture {};
  * not leave any OpenSSL errors on the OpenSSL error stack.
  * See https://github.com/nodejs/node/issues/35456 for details.
  */
-TEST_F(NodeCryptoTest, NewRootCertStore) {
-  const v8::HandleScope handle_scope(isolate_);
-  Argv argv;
-
-  Env test_env{handle_scope, argv};
-
-  node::Environment* env = *test_env;
-  node::LoadEnvironment(env, "");
-
+TEST(NodeCrypto, NewRootCertStore) {
   node::per_process::cli_options->ssl_openssl_cert_store = true;
-  X509_STORE* store = node::crypto::NewRootCertStore(env);
+  X509_STORE* store = node::crypto::NewRootCertStore();
   ASSERT_TRUE(store);
   ASSERT_EQ(ERR_peek_error(), 0UL) << "NewRootCertStore should not have left "
                                       "any errors on the OpenSSL error stack\n";

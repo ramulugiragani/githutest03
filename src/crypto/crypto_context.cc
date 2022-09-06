@@ -192,7 +192,7 @@ int SSL_CTX_use_certificate_chain(SSL_CTX* ctx,
 unsigned long LoadCertsFromFile(  // NOLINT(runtime/int)
     std::vector<X509*>* certs,
     const char* file) {
-  ClearErrorOnReturn clear_error_on_return;
+  MarkPopErrorOnReturn mark_pop_error_on_return;
 
   BIOPointer bio(BIO_new_file(file, "r"));
   if (!bio) return ERR_get_error();
@@ -202,19 +202,19 @@ unsigned long LoadCertsFromFile(  // NOLINT(runtime/int)
     certs->push_back(x509);
   }
 
-  unsigned long err = ERR_peek_error();  // NOLINT(runtime/int)
+  unsigned long err = ERR_peek_last_error();  // NOLINT(runtime/int)
   // Ignore error if its EOF/no start line found.
   if (ERR_GET_LIB(err) == ERR_LIB_PEM &&
       ERR_GET_REASON(err) == PEM_R_NO_START_LINE) {
     return 0;
+  } else {
+    return err;
   }
-
-  return err;
 }
 
 }  // namespace
 
-X509_STORE* NewRootCertStore(Environment* env) {
+X509_STORE* NewRootCertStore() {
   static std::vector<X509*> root_certs_vector;
   static bool root_certs_vector_loaded = false;
   static Mutex root_certs_vector_mutex;
@@ -241,10 +241,12 @@ X509_STORE* NewRootCertStore(Environment* env) {
           &root_certs_vector,
           extra_root_certs_file.c_str());
       if (err) {
-        ProcessEmitWarning(env,
-                           "Ignoring extra certs from `%s`, load failed: %s\n",
-                           extra_root_certs_file.c_str(),
-                           ERR_error_string(err, nullptr));
+        char buf[256];
+        ERR_error_string_n(err, buf, sizeof(buf));
+        fprintf(stderr,
+                "Warning: Ignoring extra certs from `%s`, load failed: %s\n",
+                extra_root_certs_file.c_str(),
+                buf);
       }
     }
 
@@ -260,11 +262,11 @@ X509_STORE* NewRootCertStore(Environment* env) {
 
   Mutex::ScopedLock cli_lock(node::per_process::cli_options_mutex);
   if (per_process::cli_options->ssl_openssl_cert_store) {
-    X509_STORE_set_default_paths(store);
+    CHECK_EQ(1, X509_STORE_set_default_paths(store));
   }
 
   for (X509* cert : root_certs_vector) {
-    X509_STORE_add_cert(store, cert);
+    CHECK_EQ(1, X509_STORE_add_cert(store, cert));
   }
 
   return store;
@@ -734,7 +736,7 @@ void SecureContext::AddCACert(const FunctionCallbackInfo<Value>& args) {
   while (X509* x509 = PEM_read_bio_X509_AUX(
       bio.get(), nullptr, NoPasswordCallback, nullptr)) {
     if (cert_store == root_cert_store) {
-      cert_store = NewRootCertStore(env);
+      cert_store = NewRootCertStore();
       SSL_CTX_set_cert_store(sc->ctx_.get(), cert_store);
     }
     X509_STORE_add_cert(cert_store, x509);
@@ -765,7 +767,7 @@ void SecureContext::AddCRL(const FunctionCallbackInfo<Value>& args) {
 
   X509_STORE* cert_store = SSL_CTX_get_cert_store(sc->ctx_.get());
   if (cert_store == root_cert_store) {
-    cert_store = NewRootCertStore(env);
+    cert_store = NewRootCertStore();
     SSL_CTX_set_cert_store(sc->ctx_.get(), cert_store);
   }
 
@@ -781,7 +783,7 @@ void SecureContext::AddRootCerts(const FunctionCallbackInfo<Value>& args) {
 
   if (root_cert_store == nullptr) {
     Environment* env = Environment::GetCurrent(args);
-    root_cert_store = NewRootCertStore(env);
+    root_cert_store = NewRootCertStore();
   }
 
   // Increment reference count so global store is not deleted along with CTX.
@@ -1060,7 +1062,7 @@ void SecureContext::LoadPKCS12(const FunctionCallbackInfo<Value>& args) {
       X509* ca = sk_X509_value(extra_certs.get(), i);
 
       if (cert_store == root_cert_store) {
-        cert_store = NewRootCertStore(env);
+        cert_store = NewRootCertStore();
         SSL_CTX_set_cert_store(sc->ctx_.get(), cert_store);
       }
       X509_STORE_add_cert(cert_store, ca);
