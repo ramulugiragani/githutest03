@@ -782,7 +782,6 @@ void SecureContext::AddRootCerts(const FunctionCallbackInfo<Value>& args) {
   ClearErrorOnReturn clear_error_on_return;
 
   if (root_cert_store == nullptr) {
-    Environment* env = Environment::GetCurrent(args);
     root_cert_store = NewRootCertStore();
   }
 
