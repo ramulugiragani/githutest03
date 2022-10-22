@@ -345,10 +345,14 @@ A browser-compatible implementation of [`CountQueuingStrategy`][].
 added:
   - v17.6.0
   - v16.15.0
+changes:
+  - version: v19.0.0
+    pr-url: https://github.com/nodejs/node/pull/42083
+    description: No longer behind `--experimental-global-webcrypto` CLI flag.
 -->
 
-> Stability: 1 - Experimental. Enable this API with the
-> [`--experimental-global-webcrypto`][] CLI flag.
+> Stability: 1 - Experimental. Disable this API with the
+> [`--no-experimental-global-webcrypto`][] CLI flag.
 
 A browser-compatible implementation of {Crypto}. This global is available
 only if the Node.js binary was compiled with including support for the
@@ -360,10 +364,14 @@ only if the Node.js binary was compiled with including support for the
 added:
   - v17.6.0
   - v16.15.0
+changes:
+  - version: v19.0.0
+    pr-url: https://github.com/nodejs/node/pull/42083
+    description: No longer behind `--experimental-global-webcrypto` CLI flag.
 -->
 
-> Stability: 1 - Experimental. Enable this API with the
-> [`--experimental-global-webcrypto`][] CLI flag.
+> Stability: 1 - Experimental. Disable this API with the
+> [`--no-experimental-global-webcrypto`][] CLI flag.
 
 A browser-compatible implementation of the [Web Crypto API][].
 
@@ -373,10 +381,14 @@ A browser-compatible implementation of the [Web Crypto API][].
 added:
   - v17.6.0
   - v16.15.0
+changes:
+  - version: v19.0.0
+    pr-url: https://github.com/nodejs/node/pull/42083
+    description: No longer behind `--experimental-global-webcrypto` CLI flag.
 -->
 
-> Stability: 1 - Experimental. Enable this API with the
-> [`--experimental-global-webcrypto`][] CLI flag.
+> Stability: 1 - Experimental. Disable this API with the
+> [`--no-experimental-global-webcrypto`][] CLI flag.
 
 A browser-compatible implementation of {CryptoKey}. This global is available
 only if the Node.js binary was compiled with including support for the
@@ -388,10 +400,14 @@ only if the Node.js binary was compiled with including support for the
 added:
   - v18.7.0
   - v16.17.0
+changes:
+  - version: v19.0.0
+    pr-url: https://github.com/nodejs/node/pull/44860
+    description: No longer behind `--experimental-global-customevent` CLI flag.
 -->
 
-> Stability: 1 - Experimental. Enable this API with the
-> [`--experimental-global-customevent`][] CLI flag.
+> Stability: 1 - Experimental. Disable this API with the
+> [`--no-experimental-global-customevent`][] CLI flag.
 
 <!-- type=global -->
 
@@ -528,6 +544,68 @@ The `MessagePort` class. See [`MessagePort`][] for more details.
 ## `module`
 
 This variable may appear to be global but is not. See [`module`][].
+
+## `PerformanceEntry`
+
+<!-- YAML
+added: v19.0.0
+-->
+
+<!-- type=global -->
+
+The `PerformanceEntry` class. See [`PerformanceEntry`][] for more details.
+
+## `PerformanceMark`
+
+<!-- YAML
+added: v19.0.0
+-->
+
+<!-- type=global -->
+
+The `PerformanceMark` class. See [`PerformanceMark`][] for more details.
+
+## `PerformanceMeasure`
+
+<!-- YAML
+added: v19.0.0
+-->
+
+<!-- type=global -->
+
+The `PerformanceMeasure` class. See [`PerformanceMeasure`][] for more details.
+
+## `PerformanceObserver`
+
+<!-- YAML
+added: v19.0.0
+-->
+
+<!-- type=global -->
+
+The `PerformanceObserver` class. See [`PerformanceObserver`][] for more details.
+
+## `PerformanceObserverEntryList`
+
+<!-- YAML
+added: v19.0.0
+-->
+
+<!-- type=global -->
+
+The `PerformanceObserverEntryList` class. See
+[`PerformanceObserverEntryList`][] for more details.
+
+## `PerformanceResourceTiming`
+
+<!-- YAML
+added: v19.0.0
+-->
+
+<!-- type=global -->
+
+The `PerformanceResourceTiming` class. See [`PerformanceResourceTiming`][] for
+more details.
 
 ## `performance`
 
@@ -725,10 +803,14 @@ The WHATWG [`structuredClone`][] method.
 added:
   - v17.6.0
   - v16.15.0
+changes:
+  - version: v19.0.0
+    pr-url: https://github.com/nodejs/node/pull/42083
+    description: No longer behind `--experimental-global-webcrypto` CLI flag.
 -->
 
-> Stability: 1 - Experimental. Enable this API with the
-> [`--experimental-global-webcrypto`][] CLI flag.
+> Stability: 1 - Experimental. Disable this API with the
+> [`--no-experimental-global-webcrypto`][] CLI flag.
 
 A browser-compatible implementation of {SubtleCrypto}. This global is available
 only if the Node.js binary was compiled with including support for the
@@ -869,9 +951,9 @@ added: v18.0.0
 A browser-compatible implementation of [`WritableStreamDefaultWriter`][].
 
 [Web Crypto API]: webcrypto.md
-[`--experimental-global-customevent`]: cli.md#--experimental-global-customevent
-[`--experimental-global-webcrypto`]: cli.md#--experimental-global-webcrypto
 [`--no-experimental-fetch`]: cli.md#--no-experimental-fetch
+[`--no-experimental-global-customevent`]: cli.md#--no-experimental-global-customevent
+[`--no-experimental-global-webcrypto`]: cli.md#--no-experimental-global-webcrypto
 [`AbortController`]: https://developer.mozilla.org/en-US/docs/Web/API/AbortController
 [`ByteLengthQueuingStrategy`]: webstreams.md#class-bytelengthqueuingstrategy
 [`CompressionStream`]: webstreams.md#class-compressionstream
@@ -883,6 +965,12 @@ A browser-compatible implementation of [`WritableStreamDefaultWriter`][].
 [`MessageChannel`]: worker_threads.md#class-messagechannel
 [`MessageEvent`]: https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent/MessageEvent
 [`MessagePort`]: worker_threads.md#class-messageport
+[`PerformanceEntry`]: perf_hooks.md#class-performanceentry
+[`PerformanceMark`]: perf_hooks.md#class-performancemark
+[`PerformanceMeasure`]: perf_hooks.md#class-performancemeasure
+[`PerformanceObserverEntryList`]: perf_hooks.md#class-performanceobserverentrylist
+[`PerformanceObserver`]: perf_hooks.md#class-performanceobserver
+[`PerformanceResourceTiming`]: perf_hooks.md#class-performanceresourcetiming
 [`ReadableByteStreamController`]: webstreams.md#class-readablebytestreamcontroller
 [`ReadableStreamBYOBReader`]: webstreams.md#class-readablestreambyobreader
 [`ReadableStreamBYOBRequest`]: webstreams.md#class-readablestreambyobrequest

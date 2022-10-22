@@ -50,7 +50,8 @@ class HostPort {
 
 class Options {
  public:
-  virtual void CheckOptions(std::vector<std::string>* errors) {}
+  virtual void CheckOptions(std::vector<std::string>* errors,
+                            std::vector<std::string>* argv) {}
   virtual ~Options() = default;
 };
 
@@ -99,7 +100,8 @@ class DebugOptions : public Options {
     return break_first_line || break_node_first_line;
   }
 
-  void CheckOptions(std::vector<std::string>* errors) override;
+  void CheckOptions(std::vector<std::string>* errors,
+                    std::vector<std::string>* argv) override;
 };
 
 class EnvironmentOptions : public Options {
@@ -109,10 +111,9 @@ class EnvironmentOptions : public Options {
   std::string dns_result_order;
   bool enable_source_maps = false;
   bool experimental_fetch = true;
-  bool experimental_global_customevent = false;
-  bool experimental_global_web_crypto = false;
+  bool experimental_global_customevent = true;
+  bool experimental_global_web_crypto = true;
   bool experimental_https_modules = false;
-  std::string experimental_specifier_resolution;
   bool experimental_wasm_modules = false;
   bool experimental_import_meta_resolve = false;
   std::string module_type;
@@ -153,6 +154,7 @@ class EnvironmentOptions : public Options {
   std::string redirect_warnings;
   std::string diagnostic_dir;
   bool test_runner = false;
+  std::vector<std::string> test_name_pattern;
   bool test_only = false;
   bool test_udp_no_try_send = false;
   bool throw_deprecation = false;
@@ -203,7 +205,8 @@ class EnvironmentOptions : public Options {
   inline DebugOptions* get_debug_options() { return &debug_options_; }
   inline const DebugOptions& debug_options() const { return debug_options_; }
 
-  void CheckOptions(std::vector<std::string>* errors) override;
+  void CheckOptions(std::vector<std::string>* errors,
+                    std::vector<std::string>* argv) override;
 
  private:
   DebugOptions debug_options_;
@@ -218,7 +221,8 @@ class PerIsolateOptions : public Options {
   bool experimental_shadow_realm = false;
   std::string report_signal = "SIGUSR2";
   inline EnvironmentOptions* get_per_env_options();
-  void CheckOptions(std::vector<std::string>* errors) override;
+  void CheckOptions(std::vector<std::string>* errors,
+                    std::vector<std::string>* argv) override;
 };
 
 class PerProcessOptions : public Options {
@@ -291,7 +295,8 @@ class PerProcessOptions : public Options {
   std::vector<std::string> cmdline;
 
   inline PerIsolateOptions* get_per_isolate_options();
-  void CheckOptions(std::vector<std::string>* errors) override;
+  void CheckOptions(std::vector<std::string>* errors,
+                    std::vector<std::string>* argv) override;
 };
 
 // The actual options parser, as opposed to the structs containing them:

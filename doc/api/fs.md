@@ -517,6 +517,46 @@ If one or more `filehandle.read()` calls are made on a file handle and then a
 position till the end of the file. It doesn't always read from the beginning
 of the file.
 
+#### `filehandle.readLines([options])`
+
+<!-- YAML
+added: v18.11.0
+-->
+
+* `options` {Object}
+  * `encoding` {string} **Default:** `null`
+  * `autoClose` {boolean} **Default:** `true`
+  * `emitClose` {boolean} **Default:** `true`
+  * `start` {integer}
+  * `end` {integer} **Default:** `Infinity`
+  * `highWaterMark` {integer} **Default:** `64 * 1024`
+* Returns: {readline.InterfaceConstructor}
+
+Convenience method to create a `readline` interface and stream over the file.
+See [`filehandle.createReadStream()`][] for the options.
+
+```mjs
+import { open } from 'node:fs/promises';
+
+const file = await open('./some/file/to/read');
+
+for await (const line of file.readLines()) {
+  console.log(line);
+}
+```
+
+```cjs
+const { open } = require('node:fs/promises');
+
+(async () => {
+  const file = await open('./some/file/to/read');
+
+  for await (const line of file.readLines()) {
+    console.log(line);
+  }
+})();
+```
+
 #### `filehandle.readv(buffers[, position])`
 
 <!-- YAML
@@ -866,7 +906,7 @@ added: v10.0.0
 changes:
   - version: v14.0.0
     pr-url: https://github.com/nodejs/node/pull/27044
-    description: Changed 'flags' argument to 'mode' and imposed
+    description: Changed `flags` argument to `mode` and imposed
                  stricter type validation.
 -->
 
@@ -1064,7 +1104,7 @@ import { mkdir } from 'node:fs/promises';
 
 try {
   const projectFolder = new URL('./test/project/', import.meta.url);
-  const createDir = await mkdir(path, { recursive: true });
+  const createDir = await mkdir(projectFolder, { recursive: true });
 
   console.log(`created ${createDir}`);
 } catch (err) {
@@ -1273,6 +1313,35 @@ platform-specific. On macOS, Linux, and Windows, the promise will be rejected
 with an error. On FreeBSD, a representation of the directory's contents will be
 returned.
 
+An example of reading a `package.json` file located in the same directory of the
+running code:
+
+```mjs
+import { readFile } from 'node:fs/promises';
+try {
+  const filePath = new URL('./package.json', import.meta.url);
+  const contents = await readFile(filePath, { encoding: 'utf8' });
+  console.log(contents);
+} catch (err) {
+  console.error(err.message);
+}
+```
+
+```cjs
+const { readFile } = require('node:fs/promises');
+const { resolve } = require('node:path');
+async function logFile() {
+  try {
+    const filePath = resolve('./package.json');
+    const contents = await readFile(filePath, { encoding: 'utf8' });
+    console.log(contents);
+  } catch (err) {
+    console.error(err.message);
+  }
+}
+logFile();
+```
+
 It is possible to abort an ongoing `readFile` using an {AbortSignal}. If a
 request is aborted the promise returned is rejected with an `AbortError`:
 
@@ -1463,18 +1532,27 @@ changes:
 
 <!-- YAML
 added: v10.0.0
+changes:
+  - version: v19.0.0
+    pr-url: https://github.com/nodejs/node/pull/42894
+    description: If the `type` argument is `null` or omitted, Node.js will
+                 autodetect `target` type and automatically
+                 select `dir` or `file`.
+
 -->
 
 * `target` {string|Buffer|URL}
 * `path` {string|Buffer|URL}
-* `type` {string} **Default:** `'file'`
+* `type` {string|null} **Default:** `null`
 * Returns: {Promise} Fulfills with `undefined` upon success.
 
 Creates a symbolic link.
 
 The `type` argument is only used on Windows platforms and can be one of `'dir'`,
-`'file'`, or `'junction'`. Windows junction points require the destination path
-to be absolute. When using `'junction'`, the `target` argument will
+`'file'`, or `'junction'`. If the `type` argument is not a string, Node.js will
+autodetect `target` type and use `'file'` or `'dir'`. If the `target` does not
+exist, `'file'` will be used. Windows junction points require the destination
+path to be absolute. When using `'junction'`, the `target` argument will
 automatically be normalized to absolute path.
 
 ### `fsPromises.truncate(path[, len])`
@@ -2125,7 +2203,7 @@ changes:
                  `ERR_INVALID_CALLBACK`.
   - version: v14.0.0
     pr-url: https://github.com/nodejs/node/pull/27044
-    description: Changed 'flags' argument to 'mode' and imposed
+    description: Changed `flags` argument to `mode` and imposed
                  stricter type validation.
 -->
 
@@ -4534,6 +4612,10 @@ default with the above values.
 <!-- YAML
 added: v0.11.5
 changes:
+  - version: v19.0.0
+    pr-url: https://github.com/nodejs/node/pull/42796
+    description: Passing to the `string` parameter an object with an own
+                 `toString` function is no longer supported.
   - version: v17.8.0
     pr-url: https://github.com/nodejs/node/pull/42149
     description: Passing to the `string` parameter an object with an own
@@ -4560,7 +4642,7 @@ changes:
 -->
 
 * `fd` {integer}
-* `string` {string|Object}
+* `string` {string}
 * `position` {integer|null} **Default:** `null`
 * `encoding` {string} **Default:** `'utf8'`
 * `callback` {Function}
@@ -4568,8 +4650,8 @@ changes:
   * `written` {integer}
   * `string` {string}
 
-Write `string` to the file specified by `fd`. If `string` is not a string, or an
-object with an own `toString` function property, then an exception is thrown.
+Write `string` to the file specified by `fd`. If `string` is not a string,
+an exception is thrown.
 
 `position` refers to the offset from the beginning of the file where this data
 should be written. If `typeof position !== 'number'` the data will be written at
@@ -4602,6 +4684,10 @@ details.
 <!-- YAML
 added: v0.1.29
 changes:
+  - version: v19.0.0
+    pr-url: https://github.com/nodejs/node/pull/42796
+    description: Passing to the `string` parameter an object with an own
+                 `toString` function is no longer supported.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41678
     description: Passing an invalid callback to the `callback` argument
@@ -4650,7 +4736,7 @@ changes:
 -->
 
 * `file` {string|Buffer|URL|integer} filename or file descriptor
-* `data` {string|Buffer|TypedArray|DataView|Object}
+* `data` {string|Buffer|TypedArray|DataView}
 * `options` {Object|string}
   * `encoding` {string|null} **Default:** `'utf8'`
   * `mode` {integer} **Default:** `0o666`
@@ -4955,7 +5041,7 @@ added: v8.5.0
 changes:
   - version: v14.0.0
     pr-url: https://github.com/nodejs/node/pull/27044
-    description: Changed 'flags' argument to 'mode' and imposed
+    description: Changed `flags` argument to `mode` and imposed
                  stricter type validation.
 -->
 
@@ -5840,6 +5926,10 @@ this API: [`fs.utimes()`][].
 <!-- YAML
 added: v0.1.29
 changes:
+  - version: v19.0.0
+    pr-url: https://github.com/nodejs/node/pull/42796
+    description: Passing to the `data` parameter an object with an own
+                 `toString` function is no longer supported.
   - version: v17.8.0
     pr-url: https://github.com/nodejs/node/pull/42149
     description: Passing to the `data` parameter an object with an own
@@ -5865,7 +5955,7 @@ changes:
 -->
 
 * `file` {string|Buffer|URL|integer} filename or file descriptor
-* `data` {string|Buffer|TypedArray|DataView|Object}
+* `data` {string|Buffer|TypedArray|DataView}
 * `options` {Object|string}
   * `encoding` {string|null} **Default:** `'utf8'`
   * `mode` {integer} **Default:** `0o666`
@@ -7541,7 +7631,7 @@ try {
 
 ### Threadpool usage
 
-All callback and promise-based file system APIs ( with the exception of
+All callback and promise-based file system APIs (with the exception of
 `fs.FSWatcher()`) use libuv's threadpool. This can have surprising and negative
 performance implications for some applications. See the
 [`UV_THREADPOOL_SIZE`][] documentation for more information.
@@ -7651,6 +7741,7 @@ the file contents.
 [`ReadDirectoryChangesW`]: https://docs.microsoft.com/en-us/windows/desktop/api/winbase/nf-winbase-readdirectorychangesw
 [`UV_THREADPOOL_SIZE`]: cli.md#uv_threadpool_sizesize
 [`event ports`]: https://illumos.org/man/port_create
+[`filehandle.createReadStream()`]: #filehandlecreatereadstreamoptions
 [`filehandle.createWriteStream()`]: #filehandlecreatewritestreamoptions
 [`filehandle.writeFile()`]: #filehandlewritefiledata-options
 [`fs.access()`]: #fsaccesspath-mode-callback

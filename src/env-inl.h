@@ -745,6 +745,12 @@ inline IsolateData* Environment::isolate_data() const {
   return isolate_data_;
 }
 
+template <typename T>
+inline void Environment::ForEachRealm(T&& iterator) const {
+  // TODO(legendecas): iterate over more realms bound to the environment.
+  iterator(principal_realm());
+}
+
 inline void Environment::ThrowError(const char* errmsg) {
   ThrowError(v8::Exception::Error, errmsg);
 }
@@ -781,59 +787,12 @@ inline void Environment::ThrowUVException(int errorno,
       UVException(isolate(), errorno, syscall, message, path, dest));
 }
 
-void Environment::AddCleanupHook(CleanupCallback fn, void* arg) {
-  auto insertion_info = cleanup_hooks_.emplace(CleanupHookCallback {
-    fn, arg, cleanup_hook_counter_++
-  });
-  // Make sure there was no existing element with these values.
-  CHECK_EQ(insertion_info.second, true);
+void Environment::AddCleanupHook(CleanupQueue::Callback fn, void* arg) {
+  cleanup_queue_.Add(fn, arg);
 }
 
-void Environment::RemoveCleanupHook(CleanupCallback fn, void* arg) {
-  CleanupHookCallback search { fn, arg, 0 };
-  cleanup_hooks_.erase(search);
-}
-
-size_t CleanupHookCallback::Hash::operator()(
-    const CleanupHookCallback& cb) const {
-  return std::hash<void*>()(cb.arg_);
-}
-
-bool CleanupHookCallback::Equal::operator()(
-    const CleanupHookCallback& a, const CleanupHookCallback& b) const {
-  return a.fn_ == b.fn_ && a.arg_ == b.arg_;
-}
-
-BaseObject* CleanupHookCallback::GetBaseObject() const {
-  if (fn_ == BaseObject::DeleteMe)
-    return static_cast<BaseObject*>(arg_);
-  else
-    return nullptr;
-}
-
-template <typename T>
-void Environment::ForEachBaseObject(T&& iterator) {
-  for (const auto& hook : cleanup_hooks_) {
-    BaseObject* obj = hook.GetBaseObject();
-    if (obj != nullptr)
-      iterator(obj);
-  }
-}
-
-void Environment::modify_base_object_count(int64_t delta) {
-  base_object_count_ += delta;
-}
-
-int64_t Environment::base_object_count() const {
-  return base_object_count_;
-}
-
-inline void Environment::set_base_object_created_by_bootstrap(int64_t count) {
-  base_object_created_by_bootstrap_ = base_object_count_;
-}
-
-int64_t Environment::base_object_created_after_bootstrap() const {
-  return base_object_count_ - base_object_created_by_bootstrap_;
+void Environment::RemoveCleanupHook(CleanupQueue::Callback fn, void* arg) {
+  cleanup_queue_.Remove(fn, arg);
 }
 
 void Environment::set_main_utf16(std::unique_ptr<v8::String::Value> str) {
@@ -842,7 +801,7 @@ void Environment::set_main_utf16(std::unique_ptr<v8::String::Value> str) {
 }
 
 void Environment::set_process_exit_handler(
-    std::function<void(Environment*, int)>&& handler) {
+    std::function<void(Environment*, ExitCode)>&& handler) {
   process_exit_handler_ = std::move(handler);
 }
 
@@ -916,6 +875,28 @@ v8::Local<v8::Context> Environment::context() const {
 
 Realm* Environment::principal_realm() const {
   return principal_realm_.get();
+}
+
+inline void Environment::set_heap_snapshot_near_heap_limit(uint32_t limit) {
+  heap_snapshot_near_heap_limit_ = limit;
+}
+
+inline bool Environment::is_in_heapsnapshot_heap_limit_callback() const {
+  return is_in_heapsnapshot_heap_limit_callback_;
+}
+
+inline void Environment::AddHeapSnapshotNearHeapLimitCallback() {
+  DCHECK(!heapsnapshot_near_heap_limit_callback_added_);
+  heapsnapshot_near_heap_limit_callback_added_ = true;
+  isolate_->AddNearHeapLimitCallback(Environment::NearHeapLimitCallback, this);
+}
+
+inline void Environment::RemoveHeapSnapshotNearHeapLimitCallback(
+    size_t heap_limit) {
+  DCHECK(heapsnapshot_near_heap_limit_callback_added_);
+  heapsnapshot_near_heap_limit_callback_added_ = false;
+  isolate_->RemoveNearHeapLimitCallback(Environment::NearHeapLimitCallback,
+                                        heap_limit);
 }
 
 }  // namespace node

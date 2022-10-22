@@ -12,7 +12,6 @@
 #include "src/objects/js-array-inl.h"
 #include "src/objects/js-function-inl.h"
 #include "src/objects/objects-inl.h"
-#include "src/zone/zone-handle-set.h"
 
 namespace v8 {
 namespace internal {
@@ -35,7 +34,8 @@ namespace compiler {
   V(Protector)                          \
   V(PrototypeProperty)                  \
   V(StableMap)                          \
-  V(Transition)
+  V(Transition)                         \
+  V(ObjectSlotValue)
 
 CompilationDependencies::CompilationDependencies(JSHeapBroker* broker,
                                                  Zone* zone)
@@ -115,6 +115,12 @@ class PendingDependencies final {
 
   void Register(Handle<HeapObject> object,
                 DependentCode::DependencyGroup group) {
+    // Code, which are per-local Isolate, cannot depend on objects in the shared
+    // heap. Shared heap dependencies are designed to never invalidate
+    // assumptions. E.g., maps for shared structs do not have transitions or
+    // change the shape of their fields. See
+    // DependentCode::DeoptimizeDependencyGroups for corresponding DCHECK.
+    if (object->InSharedWritableHeap()) return;
     deps_[object] |= group;
   }
 
@@ -508,7 +514,7 @@ class OwnConstantDictionaryPropertyDependency final
         index_(index),
         value_(value) {
     // We depend on map() being cached.
-    STATIC_ASSERT(ref_traits<JSObject>::ref_serialization_kind !=
+    static_assert(ref_traits<JSObject>::ref_serialization_kind !=
                   RefSerializationKind::kNeverSerialized);
   }
 
@@ -863,6 +869,42 @@ class ProtectorDependency final : public CompilationDependency {
   const PropertyCellRef cell_;
 };
 
+// Check that an object slot will not change during compilation.
+class ObjectSlotValueDependency final : public CompilationDependency {
+ public:
+  explicit ObjectSlotValueDependency(const HeapObjectRef& object, int offset,
+                                     const ObjectRef& value)
+      : CompilationDependency(kObjectSlotValue),
+        object_(object.object()),
+        offset_(offset),
+        value_(value.object()) {}
+
+  bool IsValid() const override {
+    PtrComprCageBase cage_base = GetPtrComprCageBase(*object_);
+    Object current_value =
+        offset_ == HeapObject::kMapOffset
+            ? object_->map()
+            : TaggedField<Object>::Relaxed_Load(cage_base, *object_, offset_);
+    return *value_ == current_value;
+  }
+  void Install(PendingDependencies* deps) const override {}
+
+ private:
+  size_t Hash() const override {
+    return base::hash_combine(object_.address(), offset_, value_.address());
+  }
+
+  bool Equals(const CompilationDependency* that) const override {
+    const ObjectSlotValueDependency* const zat = that->AsObjectSlotValue();
+    return object_->address() == zat->object_->address() &&
+           offset_ == zat->offset_ && value_.address() == zat->value_.address();
+  }
+
+  Handle<HeapObject> object_;
+  int offset_;
+  Handle<Object> value_;
+};
+
 class ElementsKindDependency final : public CompilationDependency {
  public:
   ElementsKindDependency(const AllocationSiteRef& site, ElementsKind kind)
@@ -1064,6 +1106,11 @@ bool CompilationDependencies::DependOnProtector(const PropertyCellRef& cell) {
   return true;
 }
 
+bool CompilationDependencies::DependOnMegaDOMProtector() {
+  return DependOnProtector(
+      MakeRef(broker_, broker_->isolate()->factory()->mega_dom_protector()));
+}
+
 bool CompilationDependencies::DependOnArrayBufferDetachingProtector() {
   return DependOnProtector(MakeRef(
       broker_,
@@ -1108,6 +1155,12 @@ void CompilationDependencies::DependOnElementsKind(
   if (AllocationSite::ShouldTrack(kind)) {
     RecordDependency(zone_->New<ElementsKindDependency>(site, kind));
   }
+}
+
+void CompilationDependencies::DependOnObjectSlotValue(
+    const HeapObjectRef& object, int offset, const ObjectRef& value) {
+  RecordDependency(
+      zone_->New<ObjectSlotValueDependency>(object, offset, value));
 }
 
 void CompilationDependencies::DependOnOwnConstantElement(
@@ -1226,25 +1279,6 @@ bool CompilationDependencies::PrepareInstallPredictable() {
   return true;
 }
 
-namespace {
-
-// This function expects to never see a JSProxy.
-void DependOnStablePrototypeChain(CompilationDependencies* deps, MapRef map,
-                                  base::Optional<JSObjectRef> last_prototype) {
-  while (true) {
-    HeapObjectRef proto = map.prototype();
-    if (!proto.IsJSObject()) {
-      CHECK_EQ(proto.map().oddball_type(), OddballType::kNull);
-      break;
-    }
-    map = proto.map();
-    deps->DependOnStableMap(map);
-    if (last_prototype.has_value() && proto.equals(*last_prototype)) break;
-  }
-}
-
-}  // namespace
-
 #define V(Name)                                                     \
   const Name##Dependency* CompilationDependency::As##Name() const { \
     DCHECK(Is##Name());                                             \
@@ -1257,16 +1291,33 @@ void CompilationDependencies::DependOnStablePrototypeChains(
     ZoneVector<MapRef> const& receiver_maps, WhereToStart start,
     base::Optional<JSObjectRef> last_prototype) {
   for (MapRef receiver_map : receiver_maps) {
-    if (receiver_map.IsPrimitiveMap()) {
-      // Perform the implicit ToObject for primitives here.
-      // Implemented according to ES6 section 7.3.2 GetV (V, P).
-      // Note: Keep sync'd with AccessInfoFactory::ComputePropertyAccessInfo.
-      base::Optional<JSFunctionRef> constructor =
-          broker_->target_native_context().GetConstructorFunction(receiver_map);
-      receiver_map = constructor.value().initial_map(this);
+    DependOnStablePrototypeChain(receiver_map, start, last_prototype);
+  }
+}
+
+void CompilationDependencies::DependOnStablePrototypeChain(
+    MapRef receiver_map, WhereToStart start,
+    base::Optional<JSObjectRef> last_prototype) {
+  if (receiver_map.IsPrimitiveMap()) {
+    // Perform the implicit ToObject for primitives here.
+    // Implemented according to ES6 section 7.3.2 GetV (V, P).
+    // Note: Keep sync'd with AccessInfoFactory::ComputePropertyAccessInfo.
+    base::Optional<JSFunctionRef> constructor =
+        broker_->target_native_context().GetConstructorFunction(receiver_map);
+    receiver_map = constructor.value().initial_map(this);
+  }
+  if (start == kStartAtReceiver) DependOnStableMap(receiver_map);
+
+  MapRef map = receiver_map;
+  while (true) {
+    HeapObjectRef proto = map.prototype();
+    if (!proto.IsJSObject()) {
+      CHECK_EQ(proto.map().oddball_type(), OddballType::kNull);
+      break;
     }
-    if (start == kStartAtReceiver) DependOnStableMap(receiver_map);
-    DependOnStablePrototypeChain(this, receiver_map, last_prototype);
+    map = proto.map();
+    DependOnStableMap(map);
+    if (last_prototype.has_value() && proto.equals(*last_prototype)) break;
   }
 }
 

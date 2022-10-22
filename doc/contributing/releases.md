@@ -166,6 +166,13 @@ When landing the PR add the `Backport-PR-URL:` line to each commit. Close the
 backport PR with `Landed in ...`. Update the label on the original PR from
 `backport-requested-vN.x` to `backported-to-vN.x`.
 
+You can add the `Backport-PR-URL` metadata by using `--backport` with
+`git node land`
+
+```console
+$ git node land --backport $PR-NUMBER
+```
+
 To determine the relevant commits, use
 [`branch-diff`](https://github.com/nodejs/branch-diff). The tool is available on
 npm and should be installed globally or run with `npx`. It depends on our commit
@@ -262,6 +269,19 @@ branch.
 ```console
 $ git checkout -b v1.2.3-proposal upstream/v1.x-staging
 ```
+
+<details>
+<summary>Security release</summary>
+
+When performing Security Releases, the `vN.x.x-proposal` branch should be
+branched off of `vN.x`.
+
+```console
+$ git checkout -b v1.2.3-proposal upstream/v1.x
+git cherry-pick  ...  # cherry-pick nodejs-private PR commits directly into the proposal
+```
+
+</details>
 
 ### 3. Update `src/node_version.h`
 
@@ -458,6 +478,9 @@ Notable changes:
 PR-URL: TBD
 ```
 
+**Note**: Ensure to push the proposal branch to the nodejs-private repository.
+Otherwise, you will leak the commits before the security release.
+
 </details>
 
 ### 6. Propose release on GitHub
@@ -580,12 +603,13 @@ the build before moving forward. Use the following list as a baseline:
   must be in the expected updated version)
 * npm version (check it matches what we expect)
 * Run the test suite against the built binaries (optional)
+  * Remember to use the proposal branch
+  * Run `make build-addons` before running the tests
+  * Remove `config.gypi` file
 
 ```console
 ./tools/test.py --shell ~/Downloads/node-v18.5.0-linux-x64/bin/node
 ```
-
-<sup>There may be test issues if the branch used to test does not match the Node.js binary.</sup>
 
 ### 11. Tag and sign the release commit
 
@@ -616,6 +640,8 @@ Create a tag using the following command:
 ```console
 $ git secure-tag <vx.y.z> <commit-sha> -sm "YYYY-MM-DD Node.js vx.y.z (<release-type>) Release"
 ```
+
+<sup>The commit-sha is the release commit. You can get it easily by running `git rev-parse HEAD`</sup>
 
 `release-type` is either "Current" or "LTS". For LTS releases, you should also
 include the release code name.
@@ -687,12 +713,16 @@ $ git pull upstream main
 $ git cherry-pick v1.x^
 ```
 
-Git should stop to let you fix conflicts. Revert all changes that were made to
-`src/node_version.h`:
+Git should stop to let you fix conflicts.
+
+Revert all changes that were made to `src/node_version.h`:
 
 ```console
 $ git checkout --ours HEAD -- src/node_version.h
 ```
+
+Even if there are no conflicts, ensure that you revert all the changes that were
+made to `src/node_version.h`.
 
 If there are conflicts in `doc` due to updated `REPLACEME`
 placeholders (that happens when a change previously landed on another release

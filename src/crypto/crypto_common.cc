@@ -89,12 +89,6 @@ void LogSecret(
   keylog_cb(ssl.get(), line.c_str());
 }
 
-bool SetALPN(const SSLPointer& ssl, std::string_view alpn) {
-  return SSL_set_alpn_protos(ssl.get(),
-                             reinterpret_cast<const uint8_t*>(alpn.data()),
-                             alpn.length()) == 0;
-}
-
 MaybeLocal<Value> GetSSLOCSPResponse(
     Environment* env,
     SSL* ssl,
@@ -992,17 +986,16 @@ static MaybeLocal<Value> GetX509NameObject(Environment* env, X509* cert) {
     if (value_str_size < 0) {
       return Undefined(env->isolate());
     }
+    auto free_value_str = OnScopeLeave([&]() { OPENSSL_free(value_str); });
 
     Local<String> v8_value;
     if (!String::NewFromUtf8(env->isolate(),
                              reinterpret_cast<const char*>(value_str),
                              NewStringType::kNormal,
-                             value_str_size).ToLocal(&v8_value)) {
-      OPENSSL_free(value_str);
+                             value_str_size)
+             .ToLocal(&v8_value)) {
       return MaybeLocal<Value>();
     }
-
-    OPENSSL_free(value_str);
 
     // For backward compatibility, we only create arrays if multiple values
     // exist for the same key. That is not great but there is not much we can

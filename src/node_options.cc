@@ -34,7 +34,8 @@ Mutex cli_options_mutex;
 std::shared_ptr<PerProcessOptions> cli_options{new PerProcessOptions()};
 }  // namespace per_process
 
-void DebugOptions::CheckOptions(std::vector<std::string>* errors) {
+void DebugOptions::CheckOptions(std::vector<std::string>* errors,
+                                std::vector<std::string>* argv) {
 #if !NODE_USE_V8_PLATFORM && !HAVE_INSPECTOR
   if (inspector_enabled) {
     errors->push_back("Inspector is not available when Node is compiled "
@@ -64,7 +65,8 @@ void DebugOptions::CheckOptions(std::vector<std::string>* errors) {
   }
 }
 
-void PerProcessOptions::CheckOptions(std::vector<std::string>* errors) {
+void PerProcessOptions::CheckOptions(std::vector<std::string>* errors,
+                                     std::vector<std::string>* argv) {
 #if HAVE_OPENSSL
   if (use_openssl_ca && use_bundled_ca) {
     errors->push_back("either --use-openssl-ca or --use-bundled-ca can be "
@@ -91,14 +93,16 @@ void PerProcessOptions::CheckOptions(std::vector<std::string>* errors) {
       use_largepages != "silent") {
     errors->push_back("invalid value for --use-largepages");
   }
-  per_isolate->CheckOptions(errors);
+  per_isolate->CheckOptions(errors, argv);
 }
 
-void PerIsolateOptions::CheckOptions(std::vector<std::string>* errors) {
-  per_env->CheckOptions(errors);
+void PerIsolateOptions::CheckOptions(std::vector<std::string>* errors,
+                                     std::vector<std::string>* argv) {
+  per_env->CheckOptions(errors, argv);
 }
 
-void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors) {
+void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors,
+                                      std::vector<std::string>* argv) {
   if (has_policy_integrity_string && experimental_policy.empty()) {
     errors->push_back("--policy-integrity requires "
                       "--experimental-policy be enabled");
@@ -110,14 +114,6 @@ void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors) {
   if (!module_type.empty()) {
     if (module_type != "commonjs" && module_type != "module") {
       errors->push_back("--input-type must be \"module\" or \"commonjs\"");
-    }
-  }
-
-  if (!experimental_specifier_resolution.empty()) {
-    if (experimental_specifier_resolution != "node" &&
-        experimental_specifier_resolution != "explicit") {
-      errors->push_back(
-        "invalid value for --experimental-specifier-resolution");
     }
   }
 
@@ -161,9 +157,6 @@ void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors) {
       errors->push_back("either --test or --watch can be used, not both");
     }
 
-    if (debug_options_.inspector_enabled) {
-      errors->push_back("the inspector cannot be used with --test");
-    }
 #ifndef ALLOW_ATTACHING_DEBUGGER_IN_TEST_RUNNER
     debug_options_.allow_attaching_debugger = false;
 #endif
@@ -172,15 +165,13 @@ void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors) {
   if (watch_mode) {
     if (syntax_check_only) {
       errors->push_back("either --watch or --check can be used, not both");
-    }
-
-    if (has_eval_string) {
+    } else if (has_eval_string) {
       errors->push_back("either --watch or --eval can be used, not both");
-    }
-
-    if (force_repl) {
+    } else if (force_repl) {
       errors->push_back("either --watch or --interactive "
                         "can be used, not both");
+    } else if (argv->size() < 1 || (*argv)[1].empty()) {
+      errors->push_back("--watch requires specifying a file");
     }
 
 #ifndef ALLOW_ATTACHING_DEBUGGER_IN_WATCH_MODE
@@ -225,7 +216,7 @@ void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors) {
     heap_prof_dir = diagnostic_dir;
   }
 
-  debug_options_.CheckOptions(errors);
+  debug_options_.CheckOptions(errors, argv);
 #endif  // HAVE_INSPECTOR
 }
 
@@ -369,11 +360,13 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption("--experimental-global-customevent",
             "expose experimental CustomEvent on the global scope",
             &EnvironmentOptions::experimental_global_customevent,
-            kAllowedInEnvironment);
+            kAllowedInEnvironment,
+            true);
   AddOption("--experimental-global-webcrypto",
             "expose experimental Web Crypto API on the global scope",
             &EnvironmentOptions::experimental_global_web_crypto,
-            kAllowedInEnvironment);
+            kAllowedInEnvironment,
+            true);
   AddOption("--experimental-json-modules", "", NoOp{}, kAllowedInEnvironment);
   AddOption("--experimental-loader",
             "use the specified module as a custom loader",
@@ -446,11 +439,8 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "set module type for string input",
             &EnvironmentOptions::module_type,
             kAllowedInEnvironment);
-  AddOption("--experimental-specifier-resolution",
-            "Select extension resolution algorithm for es modules; "
-            "either 'explicit' (default) or 'node'",
-            &EnvironmentOptions::experimental_specifier_resolution,
-            kAllowedInEnvironment);
+  AddOption(
+      "--experimental-specifier-resolution", "", NoOp{}, kAllowedInEnvironment);
   AddAlias("--es-module-specifier-resolution",
            "--experimental-specifier-resolution");
   AddOption("--deprecation",
@@ -556,6 +546,9 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
   AddOption("--test",
             "launch test runner on startup",
             &EnvironmentOptions::test_runner);
+  AddOption("--test-name-pattern",
+            "run tests whose name matches this regular expression",
+            &EnvironmentOptions::test_name_pattern);
   AddOption("--test-only",
             "run tests with 'only' option set",
             &EnvironmentOptions::test_only,

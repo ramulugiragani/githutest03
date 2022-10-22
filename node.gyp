@@ -48,9 +48,7 @@
       'deps/v8/tools/tickprocessor-driver.mjs',
       'deps/acorn/acorn/dist/acorn.js',
       'deps/acorn/acorn-walk/dist/walk.js',
-      'deps/cjs-module-lexer/lexer.js',
-      'deps/cjs-module-lexer/dist/lexer.js',
-      'deps/undici/undici.js',
+      '<@(node_builtin_shareable_builtins)',
     ],
     'node_mksnapshot_exec': '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)node_mksnapshot<(EXECUTABLE_SUFFIX)',
     'conditions': [
@@ -226,13 +224,16 @@
             },
           },
           'conditions': [
-            ['OS != "aix" and OS != "mac"', {
+            ['OS != "aix" and OS != "mac" and OS != "ios"', {
               'ldflags': [
                 '-Wl,--whole-archive',
                 '<(obj_dir)/<(STATIC_LIB_PREFIX)<(node_core_target_name)<(STATIC_LIB_SUFFIX)',
                 '<(obj_dir)/tools/v8_gypfiles/<(STATIC_LIB_PREFIX)v8_base_without_compiler<(STATIC_LIB_SUFFIX)',
                 '-Wl,--no-whole-archive',
               ],
+            }],
+            [ 'OS=="win"', {
+              'sources': [ 'src/res/node.rc' ],
             }],
           ],
         }],
@@ -465,7 +466,9 @@
         'src/api/hooks.cc',
         'src/api/utils.cc',
         'src/async_wrap.cc',
+        'src/base_object.cc',
         'src/cares_wrap.cc',
+        'src/cleanup_queue.cc',
         'src/connect_wrap.cc',
         'src/connection_wrap.cc',
         'src/debug_utils.cc',
@@ -567,6 +570,8 @@
         'src/base64-inl.h',
         'src/callback_queue.h',
         'src/callback_queue-inl.h',
+        'src/cleanup_queue.h',
+        'src/cleanup_queue-inl.h',
         'src/connect_wrap.h',
         'src/connection_wrap.h',
         'src/debug_utils.h',
@@ -596,6 +601,7 @@
         'src/node_contextify.h',
         'src/node_dir.h',
         'src/node_errors.h',
+        'src/node_exit_code.h',
         'src/node_external_reference.h',
         'src/node_file.h',
         'src/node_file-inl.h',
@@ -677,6 +683,8 @@
         'openssl_system_ca_path%': '',
         'openssl_default_cipher_list%': '',
       },
+
+      'cflags': ['-Werror=unused-result'],
 
       'defines': [
         'NODE_ARCH="<(target_arch)"',
@@ -776,7 +784,6 @@
             'src/crypto/crypto_bio.h',
             'src/crypto/crypto_clienthello-inl.h',
             'src/crypto/crypto_dh.h',
-            'src/crypto/crypto_groups.h',
             'src/crypto/crypto_hmac.h',
             'src/crypto/crypto_rsa.h',
             'src/crypto/crypto_spkac.h',
@@ -1011,6 +1018,7 @@
             'HAVE_OPENSSL=1',
           ],
           'sources': [
+            'test/cctest/test_crypto_clienthello.cc',
             'test/cctest/test_node_crypto.cc',
           ]
         }],

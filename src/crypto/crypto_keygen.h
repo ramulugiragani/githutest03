@@ -75,9 +75,6 @@ class KeyGenJob final : public CryptoJob<KeyGenTraits> {
             std::move(params)) {}
 
   void DoThreadPoolWork() override {
-    // Make sure the CSPRNG is properly seeded so the results are secure.
-    CheckEntropy();
-
     AdditionalParams* params = CryptoJob<KeyGenTraits>::params();
 
     switch (KeyGenTraits::DoKeyGen(AsyncWrap::env(), params)) {
@@ -201,7 +198,7 @@ struct KeyPairGenTraits final {
 
 struct SecretKeyGenConfig final : public MemoryRetainer {
   size_t length;        // In bytes.
-  char* out = nullptr;  // Placeholder for the generated key bytes.
+  ByteSource out;       // Placeholder for the generated key bytes.
 
   void MemoryInfo(MemoryTracker* tracker) const override;
   SET_MEMORY_INFO_NAME(SecretKeyGenConfig)

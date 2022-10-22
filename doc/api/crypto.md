@@ -1175,24 +1175,29 @@ or `setPrivateKey()` methods.
 
 ```mjs
 const { createDiffieHellmanGroup } = await import('node:crypto');
-const dh = createDiffieHellmanGroup('modp1');
+const dh = createDiffieHellmanGroup('modp16');
 ```
 
 ```cjs
 const { createDiffieHellmanGroup } = require('node:crypto');
-const dh = createDiffieHellmanGroup('modp1');
+const dh = createDiffieHellmanGroup('modp16');
 ```
 
 The following groups are supported:
 
-* `'modp1'` (768 bits, [RFC 2409][] Section 6.1)
-* `'modp2'` (1024 bits, [RFC 2409][] Section 6.2)
-* `'modp5'` (1536 bits, [RFC 3526][] Section 2)
 * `'modp14'` (2048 bits, [RFC 3526][] Section 3)
 * `'modp15'` (3072 bits, [RFC 3526][] Section 4)
 * `'modp16'` (4096 bits, [RFC 3526][] Section 5)
 * `'modp17'` (6144 bits, [RFC 3526][] Section 6)
 * `'modp18'` (8192 bits, [RFC 3526][] Section 7)
+
+The following groups are still supported but deprecated (see [Caveats][]):
+
+* `'modp1'` (768 bits, [RFC 2409][] Section 6.1) <span class="deprecated-inline"></span>
+* `'modp2'` (1024 bits, [RFC 2409][] Section 6.2) <span class="deprecated-inline"></span>
+* `'modp5'` (1536 bits, [RFC 3526][] Section 2) <span class="deprecated-inline"></span>
+
+These deprecated groups might be removed in future versions of Node.js.
 
 ## Class: `ECDH`
 
@@ -3013,6 +3018,10 @@ The `password` is used to derive the cipher key and initialization vector (IV).
 The value must be either a `'latin1'` encoded string, a [`Buffer`][], a
 `TypedArray`, or a `DataView`.
 
+<strong class="critical">This function is semantically insecure for all
+supported ciphers and fatally flawed for ciphers in counter mode (such as CTR,
+GCM, or CCM).</strong>
+
 The implementation of `crypto.createCipher()` derives keys using the OpenSSL
 function [`EVP_BytesToKey`][] with the digest algorithm set to MD5, one
 iteration, and no salt. The lack of salt allows dictionary attacks as the same
@@ -3135,6 +3144,10 @@ cipher in CCM or OCB mode (e.g. `'aes-128-ccm'`) is used. In that case, the
 `authTagLength` option is required and specifies the length of the
 authentication tag in bytes, see [CCM mode][].
 For `chacha20-poly1305`, the `authTagLength` option defaults to 16 bytes.
+
+<strong class="critical">This function is semantically insecure for all
+supported ciphers and fatally flawed for ciphers in counter mode (such as CTR,
+GCM, or CCM).</strong>
 
 The implementation of `crypto.createDecipher()` derives keys using the OpenSSL
 function [`EVP_BytesToKey`][] with the digest algorithm set to MD5, one
@@ -3549,7 +3562,9 @@ and it will be impossible to extract the private key from the returned object.
 <!-- YAML
 added: v11.6.0
 changes:
-  - version: v18.8.0
+  - version:
+    - v18.8.0
+    - v16.18.0
     pr-url: https://github.com/nodejs/node/pull/44201
     description: The key can now be zero-length.
   - version: v15.0.0
@@ -4119,10 +4134,9 @@ added: v0.7.5
 * Returns: {DiffieHellmanGroup}
 
 Creates a predefined `DiffieHellmanGroup` key exchange object. The
-supported groups are: `'modp1'`, `'modp2'`, `'modp5'` (defined in
-[RFC 2412][], but see [Caveats][]) and `'modp14'`, `'modp15'`,
-`'modp16'`, `'modp17'`, `'modp18'` (defined in [RFC 3526][]). The
-returned object mimics the interface of objects created by
+supported groups are listed in the documentation for [`DiffieHellmanGroup`][].
+
+The returned object mimics the interface of objects created by
 [`crypto.createDiffieHellman()`][], but will not allow changing
 the keys (with [`diffieHellman.setPublicKey()`][], for example). The
 advantage of using this method is that the parties do not have to
@@ -4219,7 +4233,9 @@ web-compatible code use [`crypto.webcrypto.getRandomValues()`][] instead.
 <!-- YAML
 added: v15.0.0
 changes:
-  - version: v18.8.0
+  - version:
+    - v18.8.0
+    - v16.18.0
     pr-url: https://github.com/nodejs/node/pull/44201
     description: The input keying material can now be zero-length.
   - version: v18.0.0
@@ -4282,7 +4298,9 @@ hkdf('sha512', 'key', 'salt', 'info', 64, (err, derivedKey) => {
 <!-- YAML
 added: v15.0.0
 changes:
-  - version: v18.8.0
+  - version:
+    - v18.8.0
+    - v16.18.0
     pr-url: https://github.com/nodejs/node/pull/44201
     description: The input keying material can now be zero-length.
 -->
@@ -4380,9 +4398,6 @@ otherwise `err` will be `null`. By default, the successfully generated
 `derivedKey` will be passed to the callback as a [`Buffer`][]. An error will be
 thrown if any of the input arguments specify invalid values or types.
 
-If `digest` is `null`, `'sha1'` will be used. This behavior is deprecated,
-please specify a `digest` explicitly.
-
 The `iterations` argument must be a number set as high as possible. The
 higher the number of iterations, the more secure the derived key will be,
 but will take a longer amount of time to complete.
@@ -4477,9 +4492,6 @@ applied to derive a key of the requested byte length (`keylen`) from the
 
 If an error occurs an `Error` will be thrown, otherwise the derived key will be
 returned as a [`Buffer`][].
-
-If `digest` is `null`, `'sha1'` will be used. This behavior is deprecated,
-please specify a `digest` explicitly.
 
 The `iterations` argument must be a number set as high as possible. The
 higher the number of iterations, the more secure the derived key will be,
@@ -5361,12 +5373,6 @@ is a bit field taking one of or a mix of the following flags (defined in
 * `crypto.constants.ENGINE_METHOD_ALL`
 * `crypto.constants.ENGINE_METHOD_NONE`
 
-The flags below are deprecated in OpenSSL-1.1.0.
-
-* `crypto.constants.ENGINE_METHOD_ECDH`
-* `crypto.constants.ENGINE_METHOD_ECDSA`
-* `crypto.constants.ENGINE_METHOD_STORE`
-
 ### `crypto.setFips(bool)`
 
 <!-- YAML
@@ -6124,7 +6130,6 @@ See the [list of SSL OP Flags][] for details.
 [OpenSSL's SPKAC implementation]: https://www.openssl.org/docs/man1.1.0/apps/openssl-spkac.html
 [RFC 1421]: https://www.rfc-editor.org/rfc/rfc1421.txt
 [RFC 2409]: https://www.rfc-editor.org/rfc/rfc2409.txt
-[RFC 2412]: https://www.rfc-editor.org/rfc/rfc2412.txt
 [RFC 2818]: https://www.rfc-editor.org/rfc/rfc2818.txt
 [RFC 3526]: https://www.rfc-editor.org/rfc/rfc3526.txt
 [RFC 3610]: https://www.rfc-editor.org/rfc/rfc3610.txt
@@ -6135,6 +6140,7 @@ See the [list of SSL OP Flags][] for details.
 [Web Crypto API documentation]: webcrypto.md
 [`BN_is_prime_ex`]: https://www.openssl.org/docs/man1.1.1/man3/BN_is_prime_ex.html
 [`Buffer`]: buffer.md
+[`DiffieHellmanGroup`]: #class-diffiehellmangroup
 [`EVP_BytesToKey`]: https://www.openssl.org/docs/man1.1.0/crypto/EVP_BytesToKey.html
 [`KeyObject`]: #class-keyobject
 [`Sign`]: #class-sign

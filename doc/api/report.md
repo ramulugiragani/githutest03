@@ -10,7 +10,7 @@
 
 Delivers a JSON-formatted diagnostic summary, written to a file.
 
-The report is intended for development, test and production use, to capture
+The report is intended for development, test, and production use, to capture
 and preserve information for problem determination. It includes JavaScript
 and native stack traces, heap statistics, platform information, resource
 usage etc. With the report option enabled, diagnostic reports can be triggered
@@ -508,9 +508,9 @@ the application, in expectation of self-adjusting the resource consumption,
 load balancing, monitoring etc.
 
 The content of the report consists of a header section containing the event
-type, date, time, PID and Node.js version, sections containing JavaScript and
+type, date, time, PID, and Node.js version, sections containing JavaScript and
 native stack traces, a section containing V8 heap information, a section
-containing `libuv` handle information and an OS platform information section
+containing `libuv` handle information, and an OS platform information section
 showing CPU and memory usage and system limits. An example report can be
 triggered using the Node.js REPL:
 
@@ -527,6 +527,11 @@ and the filename of the report is returned to the caller. The default filename
 includes the date, time, PID, and a sequence number. The sequence number helps
 in associating the report dump with the runtime state if generated multiple
 times for the same Node.js process.
+
+Diagnostic report has an associated single-digit version number (`report.header.reportVersion`),
+uniquely representing the report format. The version number is bumped
+when new key is added or removed, or the data type of a value is changed.
+Report version definitions are consistent across LTS releases.
 
 ## Configuration
 

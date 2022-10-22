@@ -423,8 +423,12 @@ the data is read it will consume memory that can eventually lead to a
 For backward compatibility, `res` will only emit `'error'` if there is an
 `'error'` listener registered.
 
-Node.js does not check whether Content-Length and the length of the
-body which has been transmitted are equal or not.
+Set `Content-Length` header to limit the response body size. Mismatching the
+`Content-Length` header value will result in an \[`Error`]\[] being thrown,
+identified by `code:` [`'ERR_HTTP_CONTENT_LENGTH_MISMATCH'`][].
+
+`Content-Length` value should be in bytes, not characters. Use
+[`Buffer.byteLength()`][] to determine the length of the body in bytes.
 
 ### Event: `'abort'`
 
@@ -891,7 +895,7 @@ header-related http module methods. The keys of the returned object are the
 header names and the values are the respective header values. All header names
 are lowercase.
 
-The object returned by the `response.getHeaders()` method _does not_
+The object returned by the `request.getHeaders()` method _does not_
 prototypically inherit from the JavaScript `Object`. This means that typical
 `Object` methods such as `obj.toString()`, `obj.hasOwnProperty()`, and others
 are not defined and _will not work_.
@@ -900,7 +904,7 @@ are not defined and _will not work_.
 request.setHeader('Foo', 'bar');
 request.setHeader('Cookie', ['foo=bar', 'bar=baz']);
 
-const headers = response.getHeaders();
+const headers = request.getHeaders();
 // headers === { foo: 'bar', 'cookie': ['foo=bar', 'bar=baz'] }
 ```
 
@@ -1307,8 +1311,9 @@ type other than {net.Socket}.
 
 Default behavior is to try close the socket with a HTTP '400 Bad Request',
 or a HTTP '431 Request Header Fields Too Large' in the case of a
-[`HPE_HEADER_OVERFLOW`][] error. If the socket is not writable or has already
-written data it is immediately destroyed.
+[`HPE_HEADER_OVERFLOW`][] error. If the socket is not writable or headers
+of the current attached [`http.ServerResponse`][] has been sent, it is
+immediately destroyed.
 
 `socket` is the [`net.Socket`][] object that the error originated from.
 
@@ -1467,7 +1472,7 @@ type other than {net.Socket}.
 added: v0.1.90
 changes:
   - version:
-      - REPLACEME
+      - v19.0.0
     pr-url: https://github.com/nodejs/node/pull/43522
     description: The method closes idle connections before returning.
 
@@ -2133,35 +2138,46 @@ Sends an HTTP/1.1 100 Continue message to the client, indicating that
 the request body should be sent. See the [`'checkContinue'`][] event on
 `Server`.
 
-### `response.writeEarlyHints(links[, callback])`
+### `response.writeEarlyHints(hints[, callback])`
 
 <!-- YAML
-added: REPLACEME
+added: v18.11.0
+changes:
+  - version: v18.11.0
+    pr-url: https://github.com/nodejs/node/pull/44820
+    description: Allow passing hints as an object.
 -->
 
-* `links` {string|Array}
+* `hints` {Object}
 * `callback` {Function}
 
 Sends an HTTP/1.1 103 Early Hints message to the client with a Link header,
 indicating that the user agent can preload/preconnect the linked resources.
-The `links` can be a string or an array of strings containing the values
-of the `Link` header. The optional `callback` argument will be called when
+The `hints` is an object containing the values of headers to be sent with
+early hints message. The optional `callback` argument will be called when
 the response message has been written.
 
 **Example**
 
 ```js
 const earlyHintsLink = '</styles.css>; rel=preload; as=style';
-response.writeEarlyHints(earlyHintsLink);
+response.writeEarlyHints({
+  'link': earlyHintsLink,
+});
 
 const earlyHintsLinks = [
   '</styles.css>; rel=preload; as=style',
   '</scripts.js>; rel=preload; as=script',
 ];
-response.writeEarlyHints(earlyHintsLinks);
+response.writeEarlyHints({
+  'link': earlyHintsLinks,
+  'x-trace-id': 'id for diagnostics'
+});
 
 const earlyHintsCallback = () => console.log('early hints message sent');
-response.writeEarlyHints(earlyHintsLinks, earlyHintsCallback);
+response.writeEarlyHints({
+  'link': earlyHintsLinks,
+}, earlyHintsCallback);
 ```
 
 ### `response.writeHead(statusCode[, statusMessage][, headers])`
@@ -2240,13 +2256,13 @@ const server = http.createServer((req, res) => {
 });
 ```
 
-`Content-Length` is given in bytes, not characters. Use
+`Content-Length` is read in bytes, not characters. Use
 [`Buffer.byteLength()`][] to determine the length of the body in bytes. Node.js
-does not check whether `Content-Length` and the length of the body which has
+will check whether `Content-Length` and the length of the body which has
 been transmitted are equal or not.
 
 Attempting to set a header field name or value that contains invalid characters
-will result in a [`TypeError`][] being thrown.
+will result in a \[`Error`]\[] being thrown.
 
 ### `response.writeProcessing()`
 
@@ -2411,7 +2427,7 @@ Key-value pairs of header names and values. Header names are lower-cased.
 // { 'user-agent': 'curl/7.22.0',
 //   host: '127.0.0.1:8000',
 //   accept: '*/*' }
-console.log(request.getHeaders());
+console.log(request.headers);
 ```
 
 Duplicates in raw headers are handled in the following ways, depending on the
@@ -2614,15 +2630,15 @@ Accept: text/plain
 To parse the URL into its parts:
 
 ```js
-new URL(request.url, `http://${request.getHeaders().host}`);
+new URL(request.url, `http://${request.headers.host}`);
 ```
 
-When `request.url` is `'/status?name=ryan'` and
-`request.getHeaders().host` is `'localhost:3000'`:
+When `request.url` is `'/status?name=ryan'` and `request.headers.host` is
+`'localhost:3000'`:
 
 ```console
 $ node
-> new URL(request.url, `http://${request.getHeaders().host}`)
+> new URL(request.url, `http://${request.headers.host}`)
 URL {
   href: 'http://localhost:3000/status?name=ryan',
   origin: 'http://localhost:3000',
@@ -3278,7 +3294,7 @@ server.listen(8000);
 added: v0.5.9
 changes:
   - version:
-      - REPLACEME
+      - v19.0.0
     pr-url: https://github.com/nodejs/node/pull/43522
     description: The agent now uses HTTP Keep-Alive by default.
 -->
@@ -3675,7 +3691,9 @@ try {
 ## `http.setMaxIdleHTTPParsers`
 
 <!-- YAML
-added: v18.8.0
+added:
+  - v18.8.0
+  - v16.18.0
 -->
 
 * {number}
@@ -3683,6 +3701,7 @@ added: v18.8.0
 Set the maximum number of idle HTTP parsers. **Default:** `1000`.
 
 [RFC 8187]: https://www.rfc-editor.org/rfc/rfc8187.txt
+[`'ERR_HTTP_CONTENT_LENGTH_MISMATCH'`]: errors.md#err_http_content_length_mismatch
 [`'checkContinue'`]: #event-checkcontinue
 [`'finish'`]: #event-finish
 [`'request'`]: #event-request

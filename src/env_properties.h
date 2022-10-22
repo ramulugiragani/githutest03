@@ -18,7 +18,6 @@
 // for the sake of convenience.  Strings should be ASCII-only and have a
 // "node:" prefix to avoid name clashes with third-party code.
 #define PER_ISOLATE_PRIVATE_SYMBOL_PROPERTIES(V)                               \
-  V(alpn_buffer_private_symbol, "node:alpnBuffer")                             \
   V(arrow_message_private_symbol, "node:arrowMessage")                         \
   V(contextify_context_private_symbol, "node:contextify:context")              \
   V(contextify_global_private_symbol, "node:contextify:global")                \
@@ -332,6 +331,7 @@
   V(blob_constructor_template, v8::FunctionTemplate)                           \
   V(blocklist_constructor_template, v8::FunctionTemplate)                      \
   V(contextify_global_template, v8::ObjectTemplate)                            \
+  V(contextify_wrapper_template, v8::ObjectTemplate)                           \
   V(compiled_fn_entry_template, v8::ObjectTemplate)                            \
   V(dir_instance_template, v8::ObjectTemplate)                                 \
   V(fd_constructor_template, v8::ObjectTemplate)                               \

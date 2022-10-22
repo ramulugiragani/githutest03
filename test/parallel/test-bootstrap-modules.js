@@ -57,6 +57,7 @@ const expectedModules = new Set([
   'NativeModule internal/console/constructor',
   'NativeModule internal/console/global',
   'NativeModule internal/constants',
+  'NativeModule internal/dns/utils',
   'NativeModule internal/encoding',
   'NativeModule internal/errors',
   'NativeModule internal/event_target',
@@ -71,6 +72,7 @@ const expectedModules = new Set([
   'NativeModule internal/histogram',
   'NativeModule internal/idna',
   'NativeModule internal/linkedlist',
+  'NativeModule internal/mime',
   'NativeModule internal/modules/cjs/helpers',
   'NativeModule internal/modules/cjs/loader',
   'NativeModule internal/modules/esm/assert',
@@ -113,6 +115,9 @@ const expectedModules = new Set([
   'NativeModule internal/process/warning',
   'NativeModule internal/promise_hooks',
   'NativeModule internal/querystring',
+  'NativeModule internal/readline/callbacks',
+  'NativeModule internal/readline/interface',
+  'NativeModule internal/readline/utils',
   'NativeModule internal/socketaddress',
   'NativeModule internal/source_map/source_map_cache',
   'NativeModule internal/stream_base_commons',
@@ -145,6 +150,7 @@ const expectedModules = new Set([
   'NativeModule internal/validators',
   'NativeModule internal/vm/module',
   'NativeModule internal/wasm_web_api',
+  'NativeModule internal/webidl',
   'NativeModule internal/webstreams/adapters',
   'NativeModule internal/webstreams/compression',
   'NativeModule internal/webstreams/encoding',
@@ -203,6 +209,17 @@ if (common.hasIntl) {
   expectedModules.add('Internal Binding icu');
 } else {
   expectedModules.add('NativeModule url');
+}
+
+if (common.hasCrypto) {
+  expectedModules.add('Internal Binding crypto')
+    .add('NativeModule internal/crypto/hash')
+    .add('NativeModule internal/crypto/hashnames')
+    .add('NativeModule internal/crypto/keys')
+    .add('NativeModule internal/crypto/random')
+    .add('NativeModule internal/crypto/util')
+    .add('NativeModule internal/crypto/webcrypto')
+    .add('NativeModule internal/streams/lazy_transform');
 }
 
 if (process.features.inspector) {

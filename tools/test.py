@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Copyright 2008 the V8 project authors. All rights reserved.
 # Redistribution and use in source and binary forms, with or without
@@ -957,8 +957,14 @@ class Context(object):
 
   def GetTimeout(self, mode, section=''):
     timeout = self.timeout * TIMEOUT_SCALEFACTOR[ARCH_GUESS or 'ia32'][mode]
-    if section == 'pummel' or section == 'benchmark' or section == 'wpt':
+    if section == 'pummel' or section == 'benchmark':
       timeout = timeout * 6
+    # We run all WPT from one subset in the same process using workers.
+    # As the number of the tests grow, it can take longer to run some of the
+    # subsets, but it's still overall faster than running them in different
+    # processes.
+    elif section == 'wpt':
+      timeout = timeout * 12
     return timeout
 
 def RunTestCases(cases_to_run, progress, tasks, flaky_tests_mode, measure_flakiness):
@@ -1610,9 +1616,9 @@ def Main():
   if options.check_deopts:
     options.node_args.append("--trace-opt")
     options.node_args.append("--trace-file-names")
-    # --always-opt is needed because many tests do not run long enough for the
-    # optimizer to kick in, so this flag will force it to run.
-    options.node_args.append("--always-opt")
+    # --always-turbofan is needed because many tests do not run long enough for
+    # the optimizer to kick in, so this flag will force it to run.
+    options.node_args.append("--always-turbofan")
     options.progress = "deopts"
 
   if options.worker:
