@@ -190,11 +190,16 @@ const der = Buffer.from(
 
   // Extensions tests
   assert.strictEqual(x509.extensions.basicConstraints, 'CA:FALSE');
-  assert.strictEqual(x509.extensions.subjectKeyIdentifier, 'DB:4B:48:2B:2B:7C:DE:94:AA:B8:33:81:13:B8:B0:22:2B:53:3B:42');
-  assert.strictEqual(x509.extensions.authorityKeyIdentifier, 'keyid:AF:0E:74:5B:9B:9A:66:51:09:DD:84:6F:4A:FF:89:6C:DA:67:DA:7F');
+  assert.strictEqual(x509.extensions.subjectKeyIdentifier,
+                     'DB:4B:48:2B:2B:7C:DE:94:AA:B8:33:81:13:B8:B0:22:2B:53:3B:42');
+  assert.strictEqual(x509.extensions.authorityKeyIdentifier,
+                     'keyid:AF:0E:74:5B:9B:9A:66:51:09:DD:84:6F:4A:FF:89:6C:DA:67:DA:7F');
   assert.strictEqual(x509.extensions.keyUsage, 'DigitalSignature, KeyEncipherment');
   assert.strictEqual(x509.extensions.extendedKeyUsage, 'TLSWebServerAuthentication, TLSWebClientAuthentication');
-  assert.strictEqual(x509.extensions.certificatePolicies, 'Policy: 1.3.6.1.4.1.11129.2.5.1\nCPS: https://cps.nodejs.org');
+  assert.strictEqual(
+    x509.extensions.certificatePolicies,
+    'Policy: 1.3.6.1.4.1.11129.2.5.1\nCPS: https://cps.nodejs.org'
+  );
   assert.strictEqual(x509.extensions.subjectAltName, 'DNS:agent1, DNS:www.agent1');
   assert.strictEqual(x509.extensions.authorityInfoAccess, infoAccessCheck);
   assert.strictEqual(x509.extensions.crlDistributionPoints, 'URI:http://crl.nodejs.org/ca.crl');
