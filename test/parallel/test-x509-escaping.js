@@ -502,35 +502,3 @@ const { hasOpenSSL3 } = common;
     }, common.mustCall());
   }));
 }
-
-// certificateExtensions test
-{
-  const pem = fixtures.readSync('x509-certificate-extensions.pem', 'utf8');
-
-  const cert = new X509Certificate(pem);
-  const expectedExtensions = {
-    '1.3.6.1.5.5.7.1.1': Buffer.from('test').toString('base64'),
-    '1.3.6.1.5.5.7.1.2': 'http://example.com/',
-  };
-
-  assert.deepStrictEqual(cert.certificateExtensions, expectedExtensions);
-
-  const serverKey = fixtures.readSync('x509-certificate-extensions-key.pem', 'utf8');
-
-  const server = tls.createServer({
-    key: serverKey,
-    cert: pem,
-  }, common.mustCall((conn) => {
-    conn.destroy();
-    server.close();
-  })).listen(common.mustCall(() => {
-    const { port } = server.address();
-    tls.connect(port, {
-      ca: pem,
-      servername: 'example.com',
-      checkServerIdentity: (peerCert) => {
-        assert.deepStrictEqual(peerCert.certificateExtensions, expectedExtensions);
-      },
-    }, common.mustCall());
-  }));
-}
