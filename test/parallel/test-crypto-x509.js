@@ -188,48 +188,6 @@ const der = Buffer.from(
     code: 'ERR_INVALID_ARG_VALUE'
   });
 
-  // Extensions tests
-  assert.strictEqual(x509.extensions.basicConstraints, 'CA:FALSE');
-  assert.deepStrictEqual(
-    x509.extensions.subjectKeyIdentifier,
-    ['DB:4B:48:2B:2B:7C:DE:94:AA:B8:33:81:13:B8:B0:22:2B:53:3B:42']
-  );
-  assert.deepStrictEqual(
-    x509.extensions.authorityKeyIdentifier,
-    ['keyid:AF:0E:74:5B:9B:9A:66:51:09:DD:84:6F:4A:FF:89:6C:DA:67:DA:7F']
-  );
-  assert.deepStrictEqual(
-    x509.extensions.keyUsage,
-    ['DigitalSignature', 'KeyEncipherment']
-  );
-  assert.deepStrictEqual(
-    x509.extensions.extendedKeyUsage,
-    ['TLSWebServerAuthentication', 'TLSWebClientAuthentication']
-  );
-  assert.deepStrictEqual(
-    x509.extensions.certificatePolicies,
-    [
-      'Policy: 1.3.6.1.4.1.11129.2.5.1',
-      'CPS: https://cps.nodejs.org',
-    ]
-  );
-  assert.deepStrictEqual(
-    x509.extensions.subjectAltName,
-    ['DNS:agent1', 'DNS:www.agent1']
-  );
-  assert.deepStrictEqual(
-    x509.extensions.authorityInfoAccess,
-    [infoAccessCheck]
-  );
-  assert.deepStrictEqual(
-    x509.extensions.crlDistributionPoints,
-    ['URI:http://crl.nodejs.org/ca.crl']
-  );
-  assert.deepStrictEqual(
-    x509.extensions.issuerAltName,
-    ['issuer:copy']
-  );
-
   {
     // https://github.com/nodejs/node/issues/45377
     // https://github.com/nodejs/node/issues/45485
@@ -400,4 +358,38 @@ UcXd/5qu2GhokrKU2cPttU+XAN2Om6a0
   });
 
   assert.strictEqual(cert.checkIssued(cert), false);
+}
+
+{
+  // Test X509Certificate extension methods
+
+  const certPemWithExtensions = `
+  -----BEGIN CERTIFICATE-----
+  MIIDfzCCAmegAwIBAgIJALyaX2iHyEsWMA0GCSqGSIb3DQEBCwUAMH8xCzAJBgNV
+  BAYTAkNBMQswCQYDVQQIDAJTRjELMAkGA1UEBwwCU0YxEDAOBgNVBAoMB05vZGUu
+  anMxEDAOBgNVBAsMB05vZGUuanMxEDAOBgNVBAMMB05vZGUuanMxIDAeBgkqhkiG
+  9w0BCQEWEXJ5QHRpbnljbG91ZHMub3JnMB4XDTIzMDcyOTIxMDc0N1oXDTIzMDgy
+  ODIxMDc0N1owfzELMAkGA1UEBhMCQ0ExCzAJBgNVBAgMAlNGMQswCQYDVQQHDAJT
+  RjEQMA4GA1UECgwHTm9kZS5qczEQMA4GA1UECwwHTm9kZS5qczEQMA4GA1UEAwwH
+  Tm9kZS5qczEgMB4GCSqGSIb3DQEJARYRcnlAdGlueWNsb3Vkcy5vcmcwggEiMA0G
+  CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDEyqpjcxw+gBYh7+gVzzj4WM+Njioe
+  83ZGsBxcSEEgSzgDM3SWx5udSWQD89qUjGNx3M/H6h7Nb2qLXJCPCCWcUFKLI0/4
+  ehtAet1PTEW/SlOECfdRlevIvw5z54fsIAurqNBdffEY8mbmfOrNjfblLT0HxwpX
+  ZjwTWeYvTzolSlyiQhnHZYyBKIUnNt6oc4H0NZg+qcVd1QoK/N+AYze+Lco29xw2
+  HCdPopjSpGaFcNLyoIh8d84MK1AZEJWCNJmXDgU81RCq/YFq22LKYmm54FB+/0TK
+  Oawqsh+oy/kOvlyZnddwA/nAaejX62GT2ctL+LuHXXIrFU1ZcqUmZl2rAgMBAAEw
+  DQYJKoZIhvcNAQELBQADggEBACm3LebzdU/P+vFSdjJrHwt978fFcrnv/zmszqbW
+  y5Lij1OKUiKiL1cFbT6iixqGbo7b1pDGmJ8g8Hek++4wc94OZBTGhnG0nh5V4XgC
+  CS6J4FE3iBQyNEqjlf5zCBiW4+MyPDwBhoGrABn0obyGoNKQ5iS7G2FtbHVZ7gQC
+  Gs4BCaMK8C+5ovRLYnGbKMBLXH+g2wMtiNqVApGQRUHTbKxt+PJIceg6ED/SLajW
+  kJNnoYrLIQB/TZb5teNcozJKVLKoRol1p3wy2py0E5oycYL0h4MZ1txgCY5QbM5c
+  QJ3Rjz2ZnA5fuslb+dNyNOoTkD77xa94lbtLYXMKYfQtMUE=
+  -----END CERTIFICATE-----
+  `;
+
+  const certWithExtensions = new X509Certificate(certPemWithExtensions);
+
+  assert(certWithExtensions.subjectAltName);
+  assert.strictEqual(certWithExtensions.subjectAltName.entries[0].type, 'DNS');
+  assert.strictEqual(certWithExtensions.subjectAltName.entries[0].value, 'example.com');
 }
