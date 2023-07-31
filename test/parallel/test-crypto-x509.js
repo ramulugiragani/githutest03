@@ -363,33 +363,13 @@ UcXd/5qu2GhokrKU2cPttU+XAN2Om6a0
 {
   // Test X509Certificate extension methods
 
-  const certPemWithExtensions = `
-  -----BEGIN CERTIFICATE-----
-  MIIDfzCCAmegAwIBAgIJALyaX2iHyEsWMA0GCSqGSIb3DQEBCwUAMH8xCzAJBgNV
-  BAYTAkNBMQswCQYDVQQIDAJTRjELMAkGA1UEBwwCU0YxEDAOBgNVBAoMB05vZGUu
-  anMxEDAOBgNVBAsMB05vZGUuanMxEDAOBgNVBAMMB05vZGUuanMxIDAeBgkqhkiG
-  9w0BCQEWEXJ5QHRpbnljbG91ZHMub3JnMB4XDTIzMDcyOTIxMDc0N1oXDTIzMDgy
-  ODIxMDc0N1owfzELMAkGA1UEBhMCQ0ExCzAJBgNVBAgMAlNGMQswCQYDVQQHDAJT
-  RjEQMA4GA1UECgwHTm9kZS5qczEQMA4GA1UECwwHTm9kZS5qczEQMA4GA1UEAwwH
-  Tm9kZS5qczEgMB4GCSqGSIb3DQEJARYRcnlAdGlueWNsb3Vkcy5vcmcwggEiMA0G
-  CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDEyqpjcxw+gBYh7+gVzzj4WM+Njioe
-  83ZGsBxcSEEgSzgDM3SWx5udSWQD89qUjGNx3M/H6h7Nb2qLXJCPCCWcUFKLI0/4
-  ehtAet1PTEW/SlOECfdRlevIvw5z54fsIAurqNBdffEY8mbmfOrNjfblLT0HxwpX
-  ZjwTWeYvTzolSlyiQhnHZYyBKIUnNt6oc4H0NZg+qcVd1QoK/N+AYze+Lco29xw2
-  HCdPopjSpGaFcNLyoIh8d84MK1AZEJWCNJmXDgU81RCq/YFq22LKYmm54FB+/0TK
-  Oawqsh+oy/kOvlyZnddwA/nAaejX62GT2ctL+LuHXXIrFU1ZcqUmZl2rAgMBAAEw
-  DQYJKoZIhvcNAQELBQADggEBACm3LebzdU/P+vFSdjJrHwt978fFcrnv/zmszqbW
-  y5Lij1OKUiKiL1cFbT6iixqGbo7b1pDGmJ8g8Hek++4wc94OZBTGhnG0nh5V4XgC
-  CS6J4FE3iBQyNEqjlf5zCBiW4+MyPDwBhoGrABn0obyGoNKQ5iS7G2FtbHVZ7gQC
-  Gs4BCaMK8C+5ovRLYnGbKMBLXH+g2wMtiNqVApGQRUHTbKxt+PJIceg6ED/SLajW
-  kJNnoYrLIQB/TZb5teNcozJKVLKoRol1p3wy2py0E5oycYL0h4MZ1txgCY5QbM5c
-  QJ3Rjz2ZnA5fuslb+dNyNOoTkD77xa94lbtLYXMKYfQtMUE=
-  -----END CERTIFICATE-----
-  `;
+  const certPemWithExtensions = readFileSync(fixtures.path('keys', 'crypto-extensions-cert.pem'));
 
   const certWithExtensions = new X509Certificate(certPemWithExtensions);
+ 
+  const extensions = certWithExtensions.extensions();
 
-  assert(certWithExtensions.subjectAltName);
-  assert.strictEqual(certWithExtensions.subjectAltName.entries[0].type, 'DNS');
-  assert.strictEqual(certWithExtensions.subjectAltName.entries[0].value, 'example.com');
+  assert(extensions.subjectAltName);
+  assert.strictEqual(extensions.subjectAltName.entries[0].type, 'DNS');
+  assert.strictEqual(extensions.subjectAltName.entries[0].value, 'example.com');
 }
