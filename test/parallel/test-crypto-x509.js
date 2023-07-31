@@ -363,11 +363,10 @@ UcXd/5qu2GhokrKU2cPttU+XAN2Om6a0
 {
   // Test X509Certificate extension methods
 
-  const certPemWithExtensions = readFileSync(fixtures.path('keys', 'crypto-extensions-cert.pem'));
+  const certPemWithExtensions = readFileSync(fixtures.path('keys', 'crypto-extensions.pem'));
   const certWithExtensions = new X509Certificate(certPemWithExtensions);
-  const extensions = certWithExtensions.extensions();
+  const extensions = certWithExtensions;
 
   assert(extensions.subjectAltName);
-  assert.strictEqual(extensions.subjectAltName.entries[0].type, 'DNS');
-  assert.strictEqual(extensions.subjectAltName.entries[0].value, 'example.com');
+  assert.strictEqual(extensions.subjectAltName, 'DNS:example.com, DNS:www.example.com');
 }
