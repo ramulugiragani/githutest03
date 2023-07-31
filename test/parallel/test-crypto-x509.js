@@ -364,9 +364,7 @@ UcXd/5qu2GhokrKU2cPttU+XAN2Om6a0
   // Test X509Certificate extension methods
 
   const certPemWithExtensions = readFileSync(fixtures.path('keys', 'crypto-extensions-cert.pem'));
-
   const certWithExtensions = new X509Certificate(certPemWithExtensions);
- 
   const extensions = certWithExtensions.extensions();
 
   assert(extensions.subjectAltName);
