@@ -365,8 +365,7 @@ UcXd/5qu2GhokrKU2cPttU+XAN2Om6a0
 
   const certPemWithExtensions = readFileSync(fixtures.path('keys', 'crypto-extensions.pem'));
   const certWithExtensions = new X509Certificate(certPemWithExtensions);
-  const extensions = certWithExtensions;
+  const extensions = certWithExtensions.extensions;
 
-  assert(extensions.subjectAltName);
   assert.strictEqual(extensions.subjectAltName, 'DNS:example.com, DNS:www.example.com');
 }
