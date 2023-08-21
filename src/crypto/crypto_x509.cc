@@ -86,7 +86,8 @@ Local<FunctionTemplate> X509Certificate::GetConstructorTemplate(
     SetProtoMethod(isolate, tmpl, "serialNumber", SerialNumber);
     SetProtoMethod(isolate, tmpl, "pem", Pem);
     SetProtoMethod(isolate, tmpl, "raw", Raw);
-    SetProtoMethod(isolate, tmpl, "getCertificateExtensions", GetCertificateExtensions);
+    SetProtoMethod(
+        isolate, tmpl, "getCertificateExtensions", GetCertificateExtensions);
     SetProtoMethod(isolate, tmpl, "publicKey", PublicKey);
     SetProtoMethod(isolate, tmpl, "checkCA", CheckCA);
     SetProtoMethod(isolate, tmpl, "checkHost", CheckHost);
@@ -267,34 +268,39 @@ struct CertificateExtensions {
     std::string subjectAltName;
 };
 
-void X509Certificate::GetCertificateExtensions(const FunctionCallbackInfo<Value>& args) {
-  Environment* env = Environment::GetCurrent(args);
+void X509Certificate::GetCertificateExtensions(
+    const FunctionCallbackInfo<Value>& args) {
+    Environment* env = Environment::GetCurrent(args);
 
-  Local<Object> extensions = Object::New(env->isolate());
+    Local<Object> extensions = Object::New(env->isolate());
 
-  X509Certificate* cert;
-  ASSIGN_OR_RETURN_UNWRAP(&cert, args.Holder());
+    X509Certificate* cert;
+    ASSIGN_OR_RETURN_UNWRAP(&cert, args.Holder());
 
-  X509* x509_cert = cert->get();
-  if (x509_cert) {
-      const STACK_OF(X509_EXTENSION)* ext_list = X509_get0_extensions(x509_cert);
-      int num_extensions = sk_X509_EXTENSION_num(ext_list);
+    X509* x509_cert = cert->get();
+    if (x509_cert) {
+    const STACK_OF(X509_EXTENSION)* ext_list = X509_get0_extensions(x509_cert);
+    int num_extensions = sk_X509_EXTENSION_num(ext_list);
 
-      for (int i = 0; i < num_extensions; ++i) {
-          X509_EXTENSION* ext = sk_X509_EXTENSION_value(ext_list, i);
-          const char* ext_name = OBJ_nid2ln(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
+    for (int i = 0; i < num_extensions; ++i) {
+      X509_EXTENSION* ext = sk_X509_EXTENSION_value(ext_list, i);
+      const char* ext_name =
+          OBJ_nid2ln(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
 
-          ASN1_OCTET_STRING* ext_data = X509_EXTENSION_get_data(ext);
-          const unsigned char* ext_value = ASN1_STRING_get0_data(ext_data);
-          std::string ext_value_str(reinterpret_cast<const char*>(ext_value), ASN1_STRING_length(ext_data));
+      ASN1_OCTET_STRING* ext_data = X509_EXTENSION_get_data(ext);
+      const unsigned char* ext_value = ASN1_STRING_get0_data(ext_data);
+      std::string ext_value_str(reinterpret_cast<const char*>(ext_value),
+                                ASN1_STRING_length(ext_data));
 
-          extensions->Set(env->context(),
-                          OneByteString(env->isolate(), ext_name),
-                          OneByteString(env->isolate(), ext_value_str.c_str())).IsNothing();
-      }
-  }
+      extensions
+          ->Set(env->context(),
+                OneByteString(env->isolate(), ext_name),
+                OneByteString(env->isolate(), ext_value_str.c_str()))
+          .IsNothing();
+    }
+    }
 
-  args.GetReturnValue().Set(extensions);
+    args.GetReturnValue().Set(extensions);
 }
 
 void X509Certificate::PublicKey(const FunctionCallbackInfo<Value>& args) {
