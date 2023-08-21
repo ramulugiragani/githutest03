@@ -525,7 +525,7 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
     if (!ext_bio) {
       continue;
     }
-    
+
     int result = X509V3_EXT_print(ext_bio, ext, 0, 0);
     if (result <= 0) {
       BIO_free(ext_bio);
@@ -540,9 +540,11 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
       continue;
     }
 
-    Local<String> ext_value_str =
-        String::NewFromUtf8(env->isolate(), ext_value_buf, NewStringType::kNormal, ext_value_len)
-            .ToLocalChecked();
+    Local<String> ext_value_str = String::NewFromUtf8(env->isolate(),
+                                                      ext_value_buf,
+                                                      NewStringType::kNormal,
+                                                      ext_value_len)
+                                      .ToLocalChecked();
 
     BIO_free(ext_bio);
 
