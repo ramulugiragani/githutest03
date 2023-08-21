@@ -264,21 +264,21 @@ void X509Certificate::Raw(const FunctionCallbackInfo<Value>& args) {
 }
 
 struct CertificateExtensions {
-    std::string keyUsage;
-    std::string subjectAltName;
+  std::string keyUsage;
+  std::string subjectAltName;
 };
 
 void X509Certificate::GetCertificateExtensions(
     const FunctionCallbackInfo<Value>& args) {
-    Environment* env = Environment::GetCurrent(args);
+  Environment* env = Environment::GetCurrent(args);
 
-    Local<Object> extensions = Object::New(env->isolate());
+  Local<Object> extensions = Object::New(env->isolate());
 
-    X509Certificate* cert;
-    ASSIGN_OR_RETURN_UNWRAP(&cert, args.Holder());
+  X509Certificate* cert;
+  ASSIGN_OR_RETURN_UNWRAP(&cert, args.Holder());
 
-    X509* x509_cert = cert->get();
-    if (x509_cert) {
+  X509* x509_cert = cert->get();
+  if (x509_cert) {
     const STACK_OF(X509_EXTENSION)* ext_list = X509_get0_extensions(x509_cert);
     int num_extensions = sk_X509_EXTENSION_num(ext_list);
 
@@ -298,9 +298,9 @@ void X509Certificate::GetCertificateExtensions(
                 OneByteString(env->isolate(), ext_value_str.c_str()))
           .IsNothing();
     }
-    }
+  }
 
-    args.GetReturnValue().Set(extensions);
+  args.GetReturnValue().Set(extensions);
 }
 
 void X509Certificate::PublicKey(const FunctionCallbackInfo<Value>& args) {
