@@ -519,8 +519,6 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
     const char* ext_name =
         OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
 
-    ASN1_OCTET_STRING* ext_data = X509_EXTENSION_get_data(ext);
-
     BIO* ext_bio = BIO_new(BIO_s_mem());
     if (!ext_bio) {
       continue;
