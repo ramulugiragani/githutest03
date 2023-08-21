@@ -87,7 +87,7 @@ Local<FunctionTemplate> X509Certificate::GetConstructorTemplate(
     SetProtoMethod(isolate, tmpl, "pem", Pem);
     SetProtoMethod(isolate, tmpl, "raw", Raw);
     SetProtoMethod(
-        isolate, tmpl, "getCertificateExtensions", GetCertificateExtensions);
+        isolate, tmpl, "extensions", Extensions);
     SetProtoMethod(isolate, tmpl, "publicKey", PublicKey);
     SetProtoMethod(isolate, tmpl, "checkCA", CheckCA);
     SetProtoMethod(isolate, tmpl, "checkHost", CheckHost);
@@ -268,7 +268,7 @@ struct CertificateExtensions {
   std::string subjectAltName;
 };
 
-void X509Certificate::GetCertificateExtensions(
+void X509Certificate::Extensions(
     const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
 
@@ -572,7 +572,7 @@ void X509Certificate::RegisterExternalReferences(
   registry->Register(SerialNumber);
   registry->Register(Pem);
   registry->Register(Raw);
-  registry->Register(GetCertificateExtensions);
+  registry->Register(Extensions);
   registry->Register(PublicKey);
   registry->Register(CheckCA);
   registry->Register(CheckHost);
