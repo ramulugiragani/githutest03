@@ -520,15 +520,31 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
         OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
 
     ASN1_OCTET_STRING* ext_data = X509_EXTENSION_get_data(ext);
-    const unsigned char* ext_value = ASN1_STRING_get0_data(ext_data);
-    size_t ext_value_length = ASN1_STRING_length(ext_data);
+
+    BIO* ext_bio = BIO_new(BIO_s_mem());
+    if (!ext_bio) {
+      continue;
+    }
+    
+    int result = X509V3_EXT_print(ext_bio, ext, 0, 0);
+    if (result <= 0) {
+      BIO_free(ext_bio);
+      continue;
+    }
+
+    char* ext_value_buf;
+    long ext_value_len = BIO_get_mem_data(ext_bio, &ext_value_buf);
+
+    if (!ext_value_buf || ext_value_len <= 0) {
+      BIO_free(ext_bio);
+      continue;
+    }
 
     Local<String> ext_value_str =
-        String::NewFromUtf8(env->isolate(),
-                            reinterpret_cast<const char*>(ext_value),
-                            NewStringType::kNormal,
-                            ext_value_length)
+        String::NewFromUtf8(env->isolate(), ext_value_buf, NewStringType::kNormal, ext_value_len)
             .ToLocalChecked();
+
+    BIO_free(ext_bio);
 
     extensions
         ->Set(env->context(),
