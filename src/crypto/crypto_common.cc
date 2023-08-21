@@ -523,11 +523,12 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
     const unsigned char* ext_value = ASN1_STRING_get0_data(ext_data);
     size_t ext_value_length = ASN1_STRING_length(ext_data);
 
-    Local<String> ext_value_str = String::NewFromUtf8(
-        env->isolate(),
-        reinterpret_cast<const char*>(ext_value),
-        NewStringType::kNormal,
-        ext_value_length).ToLocalChecked();
+    Local<String> ext_value_str =
+        String::NewFromUtf8(env->isolate(),
+                            reinterpret_cast<const char*>(ext_value),
+                            NewStringType::kNormal,
+                            ext_value_length)
+            .ToLocalChecked();
 
     extensions
         ->Set(env->context(),
