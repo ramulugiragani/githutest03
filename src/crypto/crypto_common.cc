@@ -531,7 +531,7 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
     }
 
     char* ext_value_buf;
-    long ext_value_len = BIO_get_mem_data(ext_bio, &ext_value_buf);
+    int64_t ext_value_len = BIO_get_mem_data(ext_bio, &ext_value_buf);
 
     if (!ext_value_buf || ext_value_len <= 0) {
       BIO_free(ext_bio);
