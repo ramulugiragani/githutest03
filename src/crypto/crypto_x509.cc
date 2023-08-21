@@ -86,8 +86,7 @@ Local<FunctionTemplate> X509Certificate::GetConstructorTemplate(
     SetProtoMethod(isolate, tmpl, "serialNumber", SerialNumber);
     SetProtoMethod(isolate, tmpl, "pem", Pem);
     SetProtoMethod(isolate, tmpl, "raw", Raw);
-    SetProtoMethod(
-        isolate, tmpl, "extensions", Extensions);
+    SetProtoMethod(isolate, tmpl, "extensions", Extensions);
     SetProtoMethod(isolate, tmpl, "publicKey", PublicKey);
     SetProtoMethod(isolate, tmpl, "checkCA", CheckCA);
     SetProtoMethod(isolate, tmpl, "checkHost", CheckHost);
@@ -268,8 +267,7 @@ struct CertificateExtensions {
   std::string subjectAltName;
 };
 
-void X509Certificate::Extensions(
-    const FunctionCallbackInfo<Value>& args) {
+void X509Certificate::Extensions(const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
 
   Local<Object> extensions = Object::New(env->isolate());
