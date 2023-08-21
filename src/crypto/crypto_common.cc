@@ -508,6 +508,37 @@ MaybeLocal<Value> GetRawDERCertificate(Environment* env, X509* cert) {
   return Buffer::New(env, ab, 0, ab->ByteLength()).FromMaybe(Local<Object>());
 }
 
+MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
+  Local<Object> extensions = Object::New(env->isolate());
+
+  const STACK_OF(X509_EXTENSION)* ext_list = X509_get0_extensions(cert);
+  int num_extensions = sk_X509_EXTENSION_num(ext_list);
+
+  for (int i = 0; i < num_extensions; ++i) {
+    X509_EXTENSION* ext = sk_X509_EXTENSION_value(ext_list, i);
+    const char* ext_name =
+        OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
+
+    ASN1_OCTET_STRING* ext_data = X509_EXTENSION_get_data(ext);
+    const unsigned char* ext_value = ASN1_STRING_get0_data(ext_data);
+    size_t ext_value_length = ASN1_STRING_length(ext_data);
+
+    Local<String> ext_value_str = String::NewFromUtf8(
+        env->isolate(),
+        reinterpret_cast<const char*>(ext_value),
+        NewStringType::kNormal,
+        ext_value_length).ToLocalChecked();
+
+    extensions
+        ->Set(env->context(),
+              String::NewFromUtf8(env->isolate(), ext_name).ToLocalChecked(),
+              ext_value_str)
+        .IsNothing();
+  }
+
+  return extensions;
+}
+
 MaybeLocal<Value> GetSerialNumber(Environment* env, X509* cert) {
   if (ASN1_INTEGER* serial_number = X509_get_serialNumber(cert)) {
     BignumPointer bn(ASN1_INTEGER_to_BN(serial_number, nullptr));
