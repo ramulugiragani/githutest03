@@ -16,7 +16,7 @@ const { Blob } = require('buffer');
     })
   });
   assert.strictEqual(d.readable, true);
-  assert.strictEqual(d.writable, false);
+  assert.strictEqual(d.writable, undefined);
   d.once('readable', common.mustCall(function() {
     assert.strictEqual(d.read().toString(), 'asd');
   }));
@@ -33,7 +33,7 @@ const { Blob } = require('buffer');
     }
   }));
   assert.strictEqual(d.readable, true);
-  assert.strictEqual(d.writable, false);
+  assert.strictEqual(d.writable, undefined);
   d.once('readable', common.mustCall(function() {
     assert.strictEqual(d.read().toString(), 'asd');
   }));
@@ -50,7 +50,7 @@ const { Blob } = require('buffer');
       callback();
     }
   }));
-  assert.strictEqual(d.readable, false);
+  assert.strictEqual(d.readable, undefined);
   assert.strictEqual(d.writable, true);
   d.end('asd');
   d.on('finish', common.mustCall(function() {
@@ -69,7 +69,7 @@ const { Blob } = require('buffer');
       }
     })
   });
-  assert.strictEqual(d.readable, false);
+  assert.strictEqual(d.readable, undefined);
   assert.strictEqual(d.writable, true);
   d.end('asd');
   d.on('finish', common.mustCall(function() {
@@ -112,7 +112,7 @@ const { Blob } = require('buffer');
 {
   const d = Duplex.from(Promise.resolve('asd'));
   assert.strictEqual(d.readable, true);
-  assert.strictEqual(d.writable, false);
+  assert.strictEqual(d.writable, undefined);
   d.once('readable', common.mustCall(function() {
     assert.strictEqual(d.read().toString(), 'asd');
   }));
