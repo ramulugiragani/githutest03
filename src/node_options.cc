@@ -173,7 +173,7 @@ void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors,
     } else if (force_repl) {
       errors->push_back("either --watch or --interactive "
                         "can be used, not both");
-    } else if (argv->size() < 1 || (*argv)[1].empty()) {
+    } else if (!test_runner && (argv->size() < 1 || (*argv)[1].empty())) {
       errors->push_back("--watch requires specifying a file");
     }
 
@@ -396,7 +396,7 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             &EnvironmentOptions::experimental_wasm_modules,
             kAllowedInEnvvar);
   AddOption("--experimental-import-meta-resolve",
-            "experimental ES Module import.meta.resolve() support",
+            "experimental ES Module import.meta.resolve() parentURL support",
             &EnvironmentOptions::experimental_import_meta_resolve,
             kAllowedInEnvvar);
   AddOption("--experimental-permission",
@@ -575,6 +575,12 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "write warnings to file instead of stderr",
             &EnvironmentOptions::redirect_warnings,
             kAllowedInEnvvar);
+  AddOption(
+      "[has_env_file_string]", "", &EnvironmentOptions::has_env_file_string);
+  AddOption("--env-file",
+            "set environment variables from supplied file",
+            &EnvironmentOptions::env_file);
+  Implies("--env-file", "[has_env_file_string]");
   AddOption("--test",
             "launch test runner on startup",
             &EnvironmentOptions::test_runner);

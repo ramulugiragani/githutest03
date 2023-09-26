@@ -278,7 +278,7 @@ run().catch(console.error);
 rs.resume(); // Drain the stream.
 ```
 
-The `finished` API provides [callback version][stream-finished]:
+The `finished` API also provides a [callback version][stream-finished].
 
 ### Object mode
 
@@ -1907,7 +1907,9 @@ has less then 64 KiB of data because no `highWaterMark` option is provided to
 ##### `readable[Symbol.asyncDispose]()`
 
 <!-- YAML
-added: v20.4.0
+added:
+ - v20.4.0
+ - v18.18.0
 -->
 
 > Stability: 1 - Experimental
@@ -2012,6 +2014,10 @@ showBoth();
 added:
   - v17.4.0
   - v16.14.0
+changes:
+  - version: v20.7.0
+    pr-url: https://github.com/nodejs/node/pull/49249
+    description: added `highWaterMark` in options.
 -->
 
 > Stability: 1 - Experimental
@@ -2025,6 +2031,8 @@ added:
 * `options` {Object}
   * `concurrency` {number} the maximum concurrent invocation of `fn` to call
     on the stream at once. **Default:** `1`.
+  * `highWaterMark` {number} how many items to buffer while waiting for user
+    consumption of the mapped items. **Default:** `concurrency * 2 - 1`.
   * `signal` {AbortSignal} allows destroying the stream if the signal is
     aborted.
 * Returns: {Readable} a stream mapped with the function `fn`.
@@ -2059,6 +2067,10 @@ for await (const result of dnsResults) {
 added:
   - v17.4.0
   - v16.14.0
+changes:
+  - version: v20.7.0
+    pr-url: https://github.com/nodejs/node/pull/49249
+    description: added `highWaterMark` in options.
 -->
 
 > Stability: 1 - Experimental
@@ -2071,6 +2083,8 @@ added:
 * `options` {Object}
   * `concurrency` {number} the maximum concurrent invocation of `fn` to call
     on the stream at once. **Default:** `1`.
+  * `highWaterMark` {number} how many items to buffer while waiting for user
+    consumption of the filtered items. **Default:** `concurrency * 2 - 1`.
   * `signal` {AbortSignal} allows destroying the stream if the signal is
     aborted.
 * Returns: {Readable} a stream filtered with the predicate `fn`.
@@ -3064,7 +3078,9 @@ added: v17.0.0
 <!-- YAML
 added: v16.8.0
 changes:
-  - version: v19.5.0
+  - version:
+    - v19.5.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/46190
     description: The `src` argument can now be a `ReadableStream` or
                  `WritableStream`.
@@ -3342,7 +3358,9 @@ reader.read().then(({ value, done }) => {
 ### `stream.getDefaultHighWaterMark(objectMode)`
 
 <!-- YAML
-added: v19.9.0
+added:
+  - v19.9.0
+  - v18.17.0
 -->
 
 * `objectMode` {boolean}
@@ -3354,7 +3372,9 @@ Defaults to `16384` (16 KiB), or `16` for `objectMode`.
 ### `stream.setDefaultHighWaterMark(objectMode, value)`
 
 <!-- YAML
-added: v19.9.0
+added:
+  - v19.9.0
+  - v18.17.0
 -->
 
 * `objectMode` {boolean}

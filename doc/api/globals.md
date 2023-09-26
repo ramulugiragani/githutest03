@@ -124,7 +124,9 @@ Returns a new `AbortSignal` which will be aborted in `delay` milliseconds.
 #### Static method: `AbortSignal.any(signals)`
 
 <!-- YAML
-added: v20.3.0
+added:
+  - v20.3.0
+  - v18.17.0
 -->
 
 * `signals` {AbortSignal\[]} The `AbortSignal`s of which to compose a new `AbortSignal`.
@@ -476,13 +478,16 @@ added:
   - v17.5.0
   - v16.15.0
 changes:
+  - version:
+    - REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/45684
+    description: No longer experimental.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41811
     description: No longer behind `--experimental-global-fetch` CLI flag.
 -->
 
-> Stability: 1 - Experimental. Disable this API with the [`--no-experimental-fetch`][]
-> CLI flag.
+> Stability: 2 - Stable
 
 A browser-compatible implementation of the [`fetch()`][] function.
 
@@ -503,13 +508,16 @@ added:
   - v17.6.0
   - v16.15.0
 changes:
+  - version:
+    - REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/45684
+    description: No longer experimental.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41811
     description: No longer behind `--experimental-global-fetch` CLI flag.
 -->
 
-> Stability: 1 - Experimental. Disable this API with the [`--no-experimental-fetch`][]
-> CLI flag.
+> Stability: 2 - Stable
 
 A browser-compatible implementation of {FormData}.
 
@@ -539,13 +547,16 @@ added:
   - v17.5.0
   - v16.15.0
 changes:
+  - version:
+    - REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/45684
+    description: No longer experimental.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41811
     description: No longer behind `--experimental-global-fetch` CLI flag.
 -->
 
-> Stability: 1 - Experimental. Disable this API with the [`--no-experimental-fetch`][]
-> CLI flag.
+> Stability: 2 - Stable
 
 A browser-compatible implementation of {Headers}.
 
@@ -811,13 +822,16 @@ added:
   - v17.5.0
   - v16.15.0
 changes:
+  - version:
+    - REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/45684
+    description: No longer experimental.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41811
     description: No longer behind `--experimental-global-fetch` CLI flag.
 -->
 
-> Stability: 1 - Experimental. Disable this API with the [`--no-experimental-fetch`][]
-> CLI flag.
+> Stability: 2 - Stable
 
 A browser-compatible implementation of {Response}.
 
@@ -828,13 +842,16 @@ added:
   - v17.5.0
   - v16.15.0
 changes:
+  - version:
+    - REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/45684
+    description: No longer experimental.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41811
     description: No longer behind `--experimental-global-fetch` CLI flag.
 -->
 
-> Stability: 1 - Experimental. Disable this API with the [`--no-experimental-fetch`][]
-> CLI flag.
+> Stability: 2 - Stable
 
 A browser-compatible implementation of {Request}.
 
@@ -1035,7 +1052,6 @@ A browser-compatible implementation of [`WritableStreamDefaultWriter`][].
 [ECMAScript module]: esm.md
 [Navigator API]: https://html.spec.whatwg.org/multipage/system-state.html#the-navigator-object
 [Web Crypto API]: webcrypto.md
-[`--no-experimental-fetch`]: cli.md#--no-experimental-fetch
 [`--no-experimental-global-customevent`]: cli.md#--no-experimental-global-customevent
 [`--no-experimental-global-webcrypto`]: cli.md#--no-experimental-global-webcrypto
 [`AbortController`]: https://developer.mozilla.org/en-US/docs/Web/API/AbortController

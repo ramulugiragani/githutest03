@@ -325,6 +325,7 @@ added: v16.11.0
   * `autoClose` {boolean} **Default:** `true`
   * `emitClose` {boolean} **Default:** `true`
   * `start` {integer}
+  * `highWaterMark` {number} **Default:** `16384`
 * Returns: {fs.WriteStream}
 
 `options` may also include a `start` option to allow writing data at some
@@ -446,12 +447,14 @@ Reads data from the file and stores that in the given buffer.
 If the file is not modified concurrently, the end-of-file is reached when the
 number of bytes read is zero.
 
-#### `filehandle.readableWebStream(options)`
+#### `filehandle.readableWebStream([options])`
 
 <!-- YAML
 added: v17.0.0
 changes:
-  - version: v20.0.0
+  - version:
+    - v20.0.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/46933
     description: Added option to create a 'bytes' stream.
 -->
@@ -820,7 +823,9 @@ the end of the file.
 #### `filehandle[Symbol.asyncDispose]()`
 
 <!-- YAML
-added: v20.4.0
+added:
+ - v20.4.0
+ - v18.18.0
 -->
 
 > Stability: 1 - Experimental
@@ -976,7 +981,9 @@ try {
 <!-- YAML
 added: v16.7.0
 changes:
-  - version: v20.1.0
+  - version:
+    - v20.1.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/47084
     description: Accept an additional `mode` option to specify
                  the copy behavior as the `mode` argument of `fs.copyFile()`.
@@ -997,7 +1004,8 @@ changes:
   * `errorOnExist` {boolean} when `force` is `false`, and the destination
     exists, throw an error. **Default:** `false`.
   * `filter` {Function} Function to filter copied files/directories. Return
-    `true` to copy the item, `false` to ignore it. Can also return a `Promise`
+    `true` to copy the item, `false` to ignore it. When ignoring a directory,
+    all of its contents will be skipped as well. Can also return a `Promise`
     that resolves to `true` or `false` **Default:** `undefined`.
     * `src` {string} source path to copy.
     * `dest` {string} destination path to copy to.
@@ -1159,6 +1167,9 @@ makeDirectory().catch(console.error);
 <!-- YAML
 added: v10.0.0
 changes:
+  - version: v20.6.0
+    pr-url: https://github.com/nodejs/node/pull/48828
+    description: The `prefix` parameter now accepts buffers and URL.
   - version:
       - v16.5.0
       - v14.18.0
@@ -1166,7 +1177,7 @@ changes:
     description: The `prefix` parameter now accepts an empty string.
 -->
 
-* `prefix` {string}
+* `prefix` {string|Buffer|URL}
 * `options` {string|Object}
   * `encoding` {string} **Default:** `'utf8'`
 * Returns: {Promise}  Fulfills with a string containing the file system path
@@ -1230,7 +1241,9 @@ a colon, Node.js will open a file system stream, as described by
 <!-- YAML
 added: v12.12.0
 changes:
-  - version: v20.1.0
+  - version:
+    - v20.1.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/41439
     description: Added `recursive` option.
   - version:
@@ -1281,7 +1294,9 @@ closed after the iterator exits.
 <!-- YAML
 added: v10.0.0
 changes:
-  - version: v20.1.0
+  - version:
+    - v20.1.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/41439
     description: Added `recursive` option.
   - version: v10.11.0
@@ -1815,6 +1830,10 @@ concurrent modifications on the same file or data corruption may occur.
 <!-- YAML
 added: v0.11.15
 changes:
+  - version: REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/49683
+    description: The constants `fs.F_OK`, `fs.R_OK`, `fs.W_OK` and `fs.X_OK`
+                 which were present directly on `fs` are deprecated.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41678
     description: Passing an invalid callback to the `callback` argument
@@ -2312,7 +2331,9 @@ copyFile('source.txt', 'destination.txt', constants.COPYFILE_EXCL, callback);
 <!-- YAML
 added: v16.7.0
 changes:
-  - version: v20.1.0
+  - version:
+    - v20.1.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/47084
     description: Accept an additional `mode` option to specify
                  the copy behavior as the `mode` argument of `fs.copyFile()`.
@@ -2338,7 +2359,8 @@ changes:
   * `errorOnExist` {boolean} when `force` is `false`, and the destination
     exists, throw an error. **Default:** `false`.
   * `filter` {Function} Function to filter copied files/directories. Return
-    `true` to copy the item, `false` to ignore it. Can also return a `Promise`
+    `true` to copy the item, `false` to ignore it. When ignoring a directory,
+    all of its contents will be skipped as well. Can also return a `Promise`
     that resolves to `true` or `false` **Default:** `undefined`.
     * `src` {string} source path to copy.
     * `dest` {string} destination path to copy to.
@@ -2548,6 +2570,7 @@ changes:
   * `start` {integer}
   * `fs` {Object|null} **Default:** `null`
   * `signal` {AbortSignal|null} **Default:** `null`
+  * `highWaterMark` {number} **Default:** `16384`
 * Returns: {fs.WriteStream}
 
 `options` may also include a `start` option to allow writing data at some
@@ -3244,6 +3267,9 @@ See the POSIX mkdir(2) documentation for more details.
 <!-- YAML
 added: v5.10.0
 changes:
+  - version: v20.6.0
+    pr-url: https://github.com/nodejs/node/pull/48828
+    description: The `prefix` parameter now accepts buffers and URL.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41678
     description: Passing an invalid callback to the `callback` argument
@@ -3267,7 +3293,7 @@ changes:
     description: The `callback` parameter is optional now.
 -->
 
-* `prefix` {string}
+* `prefix` {string|Buffer|URL}
 * `options` {string|Object}
   * `encoding` {string} **Default:** `'utf8'`
 * `callback` {Function}
@@ -3422,7 +3448,9 @@ const { openAsBlob } = require('node:fs');
 <!-- YAML
 added: v12.12.0
 changes:
-  - version: v20.1.0
+  - version:
+    - v20.1.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/41439
     description: Added `recursive` option.
   - version: v18.0.0
@@ -3562,7 +3590,9 @@ above values.
 <!-- YAML
 added: v0.1.8
 changes:
-  - version: v20.1.0
+  - version:
+    - v20.1.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/41439
     description: Added `recursive` option.
   - version: v18.0.0
@@ -5235,7 +5265,9 @@ copyFileSync('source.txt', 'destination.txt', constants.COPYFILE_EXCL);
 <!-- YAML
 added: v16.7.0
 changes:
-  - version: v20.1.0
+  - version:
+    - v20.1.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/47084
     description: Accept an additional `mode` option to specify
                  the copy behavior as the `mode` argument of `fs.copyFile()`.
@@ -5256,7 +5288,8 @@ changes:
   * `errorOnExist` {boolean} when `force` is `false`, and the destination
     exists, throw an error. **Default:** `false`.
   * `filter` {Function} Function to filter copied files/directories. Return
-    `true` to copy the item, `false` to ignore it. **Default:** `undefined`
+    `true` to copy the item, `false` to ignore it. When ignoring a directory,
+    all of its contents will be skipped as well. **Default:** `undefined`
     * `src` {string} source path to copy.
     * `dest` {string} destination path to copy to.
     * Returns: {boolean}
@@ -5550,6 +5583,9 @@ See the POSIX mkdir(2) documentation for more details.
 <!-- YAML
 added: v5.10.0
 changes:
+  - version: v20.6.0
+    pr-url: https://github.com/nodejs/node/pull/48828
+    description: The `prefix` parameter now accepts buffers and URL.
   - version:
       - v16.5.0
       - v14.18.0
@@ -5557,7 +5593,7 @@ changes:
     description: The `prefix` parameter now accepts an empty string.
 -->
 
-* `prefix` {string}
+* `prefix` {string|Buffer|URL}
 * `options` {string|Object}
   * `encoding` {string} **Default:** `'utf8'`
 * Returns: {string}
@@ -5575,7 +5611,9 @@ object with an `encoding` property specifying the character encoding to use.
 <!-- YAML
 added: v12.12.0
 changes:
-  - version: v20.1.0
+  - version:
+    - v20.1.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/41439
     description: Added `recursive` option.
   - version:
@@ -5635,7 +5673,9 @@ this API: [`fs.open()`][].
 <!-- YAML
 added: v0.1.21
 changes:
-  - version: v20.1.0
+  - version:
+    - v20.1.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/41439
     description: Added `recursive` option.
   - version: v10.10.0
@@ -6508,7 +6548,9 @@ value is determined by the `options.encoding` passed to [`fs.readdir()`][] or
 #### `dirent.path`
 
 <!-- YAML
-added: v20.1.0
+added:
+  - v20.1.0
+  - v18.17.0
 -->
 
 * {string}

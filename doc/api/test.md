@@ -609,7 +609,9 @@ added:
   - v19.6.0
   - v18.15.0
 changes:
-  - version: v19.9.0
+  - version:
+    - v19.9.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/47238
     description: Reporters are now exposed at `node:test/reporters`.
 -->
@@ -630,6 +632,9 @@ The following built-reporters are supported:
   where each passing test is represented by a `.`,
   and each failing test is represented by a `X`.
 
+* `junit`
+  The junit reporter outputs test results in a jUnit XML format
+
 When `stdout` is a [TTY][], the `spec` reporter is used by default.
 Otherwise, the `tap` reporter is used by default.
 
@@ -641,11 +646,11 @@ to the test runner's output is required, use the events emitted by the
 The reporters are available via the `node:test/reporters` module:
 
 ```mjs
-import { tap, spec, dot } from 'node:test/reporters';
+import { tap, spec, dot, junit } from 'node:test/reporters';
 ```
 
 ```cjs
-const { tap, spec, dot } = require('node:test/reporters');
+const { tap, spec, dot, junit } = require('node:test/reporters');
 ```
 
 ### Custom reporters
@@ -664,6 +669,15 @@ const customReporter = new Transform({
   writableObjectMode: true,
   transform(event, encoding, callback) {
     switch (event.type) {
+      case 'test:dequeue':
+        callback(null, `test ${event.data.name} dequeued`);
+        break;
+      case 'test:enqueue':
+        callback(null, `test ${event.data.name} enqueued`);
+        break;
+      case 'test:watch:drained':
+        callback(null, 'test watch queue drained');
+        break;
       case 'test:start':
         callback(null, `test ${event.data.name} started`);
         break;
@@ -677,6 +691,8 @@ const customReporter = new Transform({
         callback(null, 'test plan');
         break;
       case 'test:diagnostic':
+      case 'test:stderr':
+      case 'test:stdout':
         callback(null, event.data.message);
         break;
       case 'test:coverage': {
@@ -698,6 +714,15 @@ const customReporter = new Transform({
   writableObjectMode: true,
   transform(event, encoding, callback) {
     switch (event.type) {
+      case 'test:dequeue':
+        callback(null, `test ${event.data.name} dequeued`);
+        break;
+      case 'test:enqueue':
+        callback(null, `test ${event.data.name} enqueued`);
+        break;
+      case 'test:watch:drained':
+        callback(null, 'test watch queue drained');
+        break;
       case 'test:start':
         callback(null, `test ${event.data.name} started`);
         break;
@@ -711,6 +736,8 @@ const customReporter = new Transform({
         callback(null, 'test plan');
         break;
       case 'test:diagnostic':
+      case 'test:stderr':
+      case 'test:stdout':
         callback(null, event.data.message);
         break;
       case 'test:coverage': {
@@ -731,6 +758,15 @@ Example of a custom reporter using a generator function:
 export default async function * customReporter(source) {
   for await (const event of source) {
     switch (event.type) {
+      case 'test:dequeue':
+        yield `test ${event.data.name} dequeued`;
+        break;
+      case 'test:enqueue':
+        yield `test ${event.data.name} enqueued`;
+        break;
+      case 'test:watch:drained':
+        yield 'test watch queue drained';
+        break;
       case 'test:start':
         yield `test ${event.data.name} started\n`;
         break;
@@ -744,6 +780,8 @@ export default async function * customReporter(source) {
         yield 'test plan';
         break;
       case 'test:diagnostic':
+      case 'test:stderr':
+      case 'test:stdout':
         yield `${event.data.message}\n`;
         break;
       case 'test:coverage': {
@@ -760,6 +798,15 @@ export default async function * customReporter(source) {
 module.exports = async function * customReporter(source) {
   for await (const event of source) {
     switch (event.type) {
+      case 'test:dequeue':
+        yield `test ${event.data.name} dequeued`;
+        break;
+      case 'test:enqueue':
+        yield `test ${event.data.name} enqueued`;
+        break;
+      case 'test:watch:drained':
+        yield 'test watch queue drained';
+        break;
       case 'test:start':
         yield `test ${event.data.name} started\n`;
         break;
@@ -773,6 +820,8 @@ module.exports = async function * customReporter(source) {
         yield 'test plan\n';
         break;
       case 'test:diagnostic':
+      case 'test:stderr':
+      case 'test:stdout':
         yield `${event.data.message}\n`;
         break;
       case 'test:coverage': {
@@ -815,7 +864,9 @@ added:
   - v18.9.0
   - v16.19.0
 changes:
-  - version: v20.1.0
+  - version:
+    - v20.1.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/47628
     description: Add a testNamePatterns option.
 -->
@@ -836,6 +887,8 @@ changes:
     number. If a nullish value is provided, each process gets its own port,
     incremented from the primary's `process.debugPort`.
     **Default:** `undefined`.
+  * `only`: {boolean} If truthy, the test context will only run tests that
+    have the `only` option set
   * `setup` {Function} A function that accepts the `TestsStream` instance
     and can be used to setup listeners before any tests are run.
     **Default:** `undefined`.
@@ -860,7 +913,9 @@ changes:
 
 ```mjs
 import { tap } from 'node:test/reporters';
+import { run } from 'node:test';
 import process from 'node:process';
+import path from 'node:path';
 
 run({ files: [path.resolve('./tests/test.js')] })
   .compose(tap)
@@ -869,6 +924,8 @@ run({ files: [path.resolve('./tests/test.js')] })
 
 ```cjs
 const { tap } = require('node:test/reporters');
+const { run } = require('node:test');
+const path = require('node:path');
 
 run({ files: [path.resolve('./tests/test.js')] })
   .compose(tap)
@@ -882,7 +939,9 @@ added:
   - v18.0.0
   - v16.17.0
 changes:
-  - version: v20.2.0
+  - version:
+    - v20.2.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/47909
     description: Added the `skip`, `todo`, and `only` shorthands.
   - version:
@@ -1529,9 +1588,10 @@ added:
 Enables timer mocking for the specified timers.
 
 * `timers` {Array} An optional array containing the timers to mock.
-  The currently supported timer values are `'setInterval'` and `'setTimeout'`.
-  If no array is provided, all timers (`'setInterval'`, `'clearInterval'`, `'setTimeout'`,
-  and `'clearTimeout'`) will be mocked by default.
+  The currently supported timer values are `'setInterval'`, `'setTimeout'`,
+  and `'setImmediate'`.  If no value is provided, all timers (`'setInterval'`,
+  `'clearInterval'`, `'setTimeout'`, `'clearTimeout'`, `'setImmediate'`,
+  and `'clearImmediate'`) will be mocked by default.
 
 **Note:** When you enable mocking for a specific timer, its associated
 clear function will also be implicitly mocked.
@@ -1543,7 +1603,7 @@ import { mock } from 'node:test';
 mock.timers.enable(['setInterval']);
 ```
 
-```js
+```cjs
 const { mock } = require('node:test');
 mock.timers.enable(['setInterval']);
 ```
@@ -1580,7 +1640,7 @@ import { mock } from 'node:test';
 mock.timers.reset();
 ```
 
-```js
+```cjs
 const { mock } = require('node:test');
 mock.timers.reset();
 ```
@@ -1629,7 +1689,7 @@ test('mocks setTimeout to be executed synchronously without having to actually w
 });
 ```
 
-```js
+```cjs
 const assert = require('node:assert');
 const { test } = require('node:test');
 
@@ -1668,7 +1728,7 @@ test('mocks setTimeout to be executed synchronously without having to actually w
 });
 ```
 
-```js
+```cjs
 const assert = require('node:assert');
 const { test } = require('node:test');
 
@@ -1712,7 +1772,7 @@ test('mocks setTimeout to be executed synchronously without having to actually w
 });
 ```
 
-```js
+```cjs
 const assert = require('node:assert');
 const { test } = require('node:test');
 
@@ -1769,7 +1829,7 @@ test('mocks setTimeout to be executed synchronously without having to actually w
 });
 ```
 
-```js
+```cjs
 const assert = require('node:assert');
 const { test } = require('node:test');
 const nodeTimers = require('node:timers');
@@ -1831,7 +1891,7 @@ test('should tick five times testing a real use case', async (context) => {
 });
 ```
 
-```js
+```cjs
 const assert = require('node:assert');
 const { test } = require('node:test');
 const nodeTimersPromises = require('node:timers/promises');
@@ -1897,7 +1957,7 @@ test('runAll functions following the given order', (context) => {
 });
 ```
 
-```js
+```cjs
 const assert = require('node:assert');
 const { test } = require('node:test');
 
@@ -1930,6 +1990,13 @@ clocks or actual timers outside of the mocking environment.
 added:
   - v18.9.0
   - v16.19.0
+changes:
+  - version:
+    - v20.0.0
+    - v19.9.0
+    - v18.17.0
+    pr-url: https://github.com/nodejs/node/pull/47094
+    description: added type to test:pass and test:fail events for when the test is a suite.
 -->
 
 * Extends {ReadableStream}
@@ -1954,8 +2021,18 @@ object, streaming a series of events representing the execution of the tests.
       * `coveredLinePercent` {number} The percentage of lines covered.
       * `coveredBranchPercent` {number} The percentage of branches covered.
       * `coveredFunctionPercent` {number} The percentage of functions covered.
-      * `uncoveredLineNumbers` {Array} An array of integers representing line
-        numbers that are uncovered.
+      * `functions` {Array} An array of functions representing function
+        coverage.
+        * `name` {string} The name of the function.
+        * `line` {number} The line number where the function is defined.
+        * `count` {number} The number of times the function was called.
+      * `branches` {Array} An array of branches representing branch coverage.
+        * `line` {number} The line number where the branch is defined.
+        * `count` {number} The number of times the branch was taken.
+      * `lines` {Array} An array of lines representing line
+        numbers and the number of times they were covered.
+        * `line` {number} The line number.
+        * `count` {number} The number of times the line was covered.
     * `totals` {Object} An object containing a summary of coverage for all
       files.
       * `totalLineCount` {number} The total number of lines.
@@ -1977,8 +2054,12 @@ Emitted when code coverage is enabled and all tests have completed.
 ### Event: `'test:dequeue'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string|undefined} The path of the test file,
     `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `name` {string} The test name.
   * `nesting` {number} The nesting level of the test.
 
@@ -1987,8 +2068,12 @@ Emitted when a test is dequeued, right before it is executed.
 ### Event: `'test:diagnostic'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string|undefined} The path of the test file,
     `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `message` {string} The diagnostic message.
   * `nesting` {number} The nesting level of the test.
 
@@ -1997,8 +2082,12 @@ Emitted when [`context.diagnostic`][] is called.
 ### Event: `'test:enqueue'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string|undefined} The path of the test file,
     `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `name` {string} The test name.
   * `nesting` {number} The nesting level of the test.
 
@@ -2007,11 +2096,18 @@ Emitted when a test is enqueued for execution.
 ### Event: `'test:fail'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `details` {Object} Additional execution metadata.
-    * `duration` {number} The duration of the test in milliseconds.
-    * `error` {Error} The error thrown by the test.
+    * `duration_ms` {number} The duration of the test in milliseconds.
+    * `error` {Error} An error wrapping the error thrown by the test.
+      * `cause` {Error} The actual error thrown by the test.
+    * `type` {string|undefined} The type of the test, used to denote whether
+      this is a suite.
   * `file` {string|undefined} The path of the test file,
     `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `name` {string} The test name.
   * `nesting` {number} The nesting level of the test.
   * `testNumber` {number} The ordinal number of the test.
@@ -2023,10 +2119,16 @@ Emitted when a test fails.
 ### Event: `'test:pass'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `details` {Object} Additional execution metadata.
-    * `duration` {number} The duration of the test in milliseconds.
+    * `duration_ms` {number} The duration of the test in milliseconds.
+    * `type` {string|undefined} The type of the test, used to denote whether
+      this is a suite.
   * `file` {string|undefined} The path of the test file,
     `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `name` {string} The test name.
   * `nesting` {number} The nesting level of the test.
   * `testNumber` {number} The ordinal number of the test.
@@ -2038,8 +2140,12 @@ Emitted when a test passes.
 ### Event: `'test:plan'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string|undefined} The path of the test file,
     `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `nesting` {number} The nesting level of the test.
   * `count` {number} The number of subtests that have ran.
 
@@ -2048,8 +2154,12 @@ Emitted when all subtests have completed for a given test.
 ### Event: `'test:start'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string|undefined} The path of the test file,
     `undefined` if test was run through the REPL.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `name` {string} The test name.
   * `nesting` {number} The nesting level of the test.
 
@@ -2060,7 +2170,11 @@ defined.
 ### Event: `'test:stderr'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string} The path of the test file.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `message` {string} The message written to `stderr`.
 
 Emitted when a running test writes to `stderr`.
@@ -2069,7 +2183,11 @@ This event is only emitted if `--test` flag is passed.
 ### Event: `'test:stdout'`
 
 * `data` {Object}
+  * `column` {number|undefined} The column number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `file` {string} The path of the test file.
+  * `line` {number|undefined} The line number where the test is defined, or
+    `undefined` if the test was run through the REPL.
   * `message` {string} The message written to `stdout`.
 
 Emitted when a running test writes to `stdout`.
@@ -2086,7 +2204,9 @@ added:
   - v18.0.0
   - v16.17.0
 changes:
-  - version: v20.1.0
+  - version:
+    - v20.1.0
+    - v18.17.0
     pr-url: https://github.com/nodejs/node/pull/47586
     description: The `before` function was added to TestContext.
 -->
@@ -2098,7 +2218,9 @@ exposed as part of the API.
 ### `context.before([fn][, options])`
 
 <!-- YAML
-added: v20.1.0
+added:
+  - v20.1.0
+  - v18.17.0
 -->
 
 * `fn` {Function|AsyncFunction} The hook function. The first argument
