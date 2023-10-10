@@ -20,6 +20,7 @@
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "async_wrap.h"  // NOLINT(build/include_inline)
+#include "async_context_frame.h"
 #include "async_wrap-inl.h"
 #include "env-inl.h"
 #include "node_errors.h"
@@ -501,8 +502,9 @@ AsyncWrap::AsyncWrap(Environment* env,
 }
 
 AsyncWrap::AsyncWrap(Environment* env, Local<Object> object)
-  : BaseObject(env, object) {
-}
+    : BaseObject(env, object),
+      context_frame_(env->isolate(),
+                     async_context_frame::current(env->isolate())) {}
 
 // This method is necessary to work around one specific problem:
 // Before the init() hook runs, if there is one, the BaseObject() constructor
@@ -594,8 +596,9 @@ void AsyncWrap::AsyncReset(Local<Object> resource, double execution_async_id,
                                                      : execution_async_id;
   trigger_async_id_ = env()->get_default_trigger_async_id();
 
+  Isolate* isolate = env()->isolate();
   {
-    HandleScope handle_scope(env()->isolate());
+    HandleScope handle_scope(isolate);
     Local<Object> obj = object();
     CHECK(!obj.IsEmpty());
     if (resource != obj) {
@@ -624,6 +627,8 @@ void AsyncWrap::AsyncReset(Local<Object> resource, double execution_async_id,
     default:
       UNREACHABLE();
   }
+
+  context_frame_.Reset(isolate, async_context_frame::current(isolate));
 
   if (silent) return;
 
@@ -668,8 +673,15 @@ MaybeLocal<Value> AsyncWrap::MakeCallback(const Local<Function> cb,
 
   ProviderType provider = provider_type();
   async_context context { get_async_id(), get_trigger_async_id() };
-  MaybeLocal<Value> ret = InternalMakeCallback(
-      env(), object(), object(), cb, argc, argv, context);
+  MaybeLocal<Value> ret =
+      InternalMakeCallback(env(),
+                           object(),
+                           object(),
+                           cb,
+                           argc,
+                           argv,
+                           context,
+                           context_frame_.Get(env()->isolate()));
 
   // This is a static call with cached values because the `this` object may
   // no longer be alive at this point.
