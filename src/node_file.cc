@@ -3101,11 +3101,11 @@ void BindingData::LegacyMainResolve(const FunctionCallbackInfo<Value>& args) {
     return;
   }
 
+  std::string error_invalid_module_path =
+      "Cannot find entry file for module " + module_path + " in " + module_base;
+
   env->isolate()->ThrowException(
-      ERR_MODULE_NOT_FOUND(env->isolate(),
-                           "Cannot find package '%s' imported from %s",
-                           module_path,
-                           module_base));
+      ERR_INVALID_MODULE(env->isolate(), error_invalid_module_path.c_str()));
 }
 
 void BindingData::MemoryInfo(MemoryTracker* tracker) const {
