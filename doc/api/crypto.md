@@ -2873,6 +2873,28 @@ added: v15.6.0
 Verifies that this certificate was signed by the given public key.
 Does not perform any other validation checks on the certificate.
 
+### `x509.extensions`
+
+The `X509Certificate` class provides access to various properties of X.509 certificates, including extensions. Here, we describe the `x509.extensions` property, which represents the extensions of the certificate.
+
+### x509.extensions
+
+* Type: {Object}
+
+The `x509.extensions` property returns an object representing the extensions of the certificate. These extensions provide additional information about the certificate.
+
+Example:
+
+```javascript
+const { X509Certificate } = require('crypto');
+
+const certPem = '...'; // Replace with your X.509 certificate in PEM format
+const x509 = new X509Certificate(certPem);
+
+const extensions = x509.extensions;
+console.log(extensions);
+```
+
 ## `node:crypto` module methods and properties
 
 ### `crypto.constants`
