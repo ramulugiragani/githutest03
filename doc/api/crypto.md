@@ -2875,30 +2875,14 @@ Does not perform any other validation checks on the certificate.
 
 ### `x509.extensions`
 
-The `X509Certificate` class provides access to various
-properties of X.509 certificates, including extensions.
-Here, we describe the `x509.extensions` property,
-which represents the extensions of the certificate.
 
-### x509.extensions
+<!-- YAML
+added: REPLACEME
+-->
 
-* Type: {Object}
+Returns: {Object}
 
-The `x509.extensions` property returns an object representing
-the extensions of the certificate. These extensions
-provide additional information about the certificate.
-
-Example:
-
-```cjs
-const { X509Certificate } = require('crypto');
-
-const certPem = '...'; // Replace with your X.509 certificate in PEM format
-const x509 = new X509Certificate(certPem);
-
-const extensions = x509.extensions;
-console.log(extensions);
-```
+Returns an object representing the extensions of the certificate.
 
 ## `node:crypto` module methods and properties
 
