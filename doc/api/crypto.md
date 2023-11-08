@@ -2877,7 +2877,7 @@ Does not perform any other validation checks on the certificate.
 
 The `X509Certificate` class provides access to various properties of X.509 certificates, including extensions. Here, we describe the `x509.extensions` property, which represents the extensions of the certificate.
 
-### x509.extensions
+### x509.extensions 
 
 * Type: {Object}
 
