@@ -2875,22 +2875,17 @@ Does not perform any other validation checks on the certificate.
 
 ### `x509.extensions`
 
-The `X509Certificate` class provides access to various
-properties of X.509 certificates, including extensions.
-Here, we describe the `x509.extensions` property,
-which represents the extensions of the certificate.
+The `X509Certificate` class provides access to various properties of X.509 certificates, including extensions. Here, we describe the `x509.extensions` property, which represents the extensions of the certificate.
 
 ### x509.extensions
 
 * Type: {Object}
 
-The `x509.extensions` property returns an object representing
-the extensions of the certificate. These extensions
-provide additional information about the certificate.
+The `x509.extensions` property returns an object representing the extensions of the certificate. These extensions provide additional information about the certificate.
 
 Example:
 
-```cjs
+```javascript
 const { X509Certificate } = require('crypto');
 
 const certPem = '...'; // Replace with your X.509 certificate in PEM format
