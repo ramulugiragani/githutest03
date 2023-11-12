@@ -2875,7 +2875,6 @@ Does not perform any other validation checks on the certificate.
 
 ### `x509.extensions`
 
-
 <!-- YAML
 added: REPLACEME
 -->
