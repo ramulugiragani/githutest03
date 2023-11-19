@@ -518,6 +518,10 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
     X509_EXTENSION* ext = sk_X509_EXTENSION_value(ext_list, i);
     const char* ext_name =
         OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
+    
+    if (ext_name == NULL) {
+      ext_name = "UNKNOWN";
+    }
 
     static BIO* ext_bio = NULL;
 
