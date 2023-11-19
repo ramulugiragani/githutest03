@@ -517,34 +517,30 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
   for (int i = 0; i < num_extensions; ++i) {
     X509_EXTENSION* ext = sk_X509_EXTENSION_value(ext_list, i);
     const char* ext_name =
-        OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
-    
-    if (ext_name == NULL) {
+      OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
+    if (ext_name == nullptr) {
       ext_name = "UNKNOWN";
     }
 
-    static BIO* ext_bio = NULL;
-
-    // Check if the BIO has been created
-    if (ext_bio == NULL) {
-        ext_bio = BIO_new(BIO_s_mem());
+    static BIO* ext_bio = nullptr;
+    if (ext_bio == nullptr) {
+      ext_bio = BIO_new(BIO_s_mem());
     } else {
-        // Reset the existing BIO for reuse
-        BIO_reset(ext_bio);
+      BIO_reset(ext_bio);
     }
-   if (!ext_bio) {
-    CHECK(false) << "Error processing extension data for " << ext_name;
-    continue;
-}
+    if (!ext_bio) {
+      CHECK(false) << "Error processing extension data for " << ext_name;
+      continue;
+    }
 
     ASN1_OBJECT* ext_obj = X509_EXTENSION_get_object(ext);
     int ext_nid = OBJ_obj2nid(ext_obj);
 
     ASN1_OCTET_STRING* ext_data = X509_EXTENSION_get_data(ext);
 
-    char* ext_value = (char*)ASN1_STRING_data(ext_data);
+    char* ext_value = reinterpret_cast<char*>(ASN1_STRING_data(ext_data));
 
-    if (ext_value == NULL) {
+    if (ext_value == nullptr) {
       BIO_free(ext_bio);
       continue;
     }
@@ -559,16 +555,18 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
 
     v8::Isolate* isolate = env->isolate();
     v8::Local<v8::String> ext_value_str = v8::String::NewExternal(
-        isolate, 
-        new v8::ExternalStringResourceImpl(ext_value_buf, ext_value_len)
-    );
+        isolate,
+        new v8::ExternalStringResourceImpl(ext_value_buf, ext_value_len));
 
     BIO_free(ext_bio);
 
-    v8::Local<v8::String> ext_name_str = String::NewFromUtf8(env->isolate(), ext_name).ToLocalChecked();
+    v8::Local<v8::String> ext_name_str =
+        String::NewFromUtf8(env->isolate(), ext_name).ToLocalChecked();
 
-    if (your_object->Set(env->context(), ext_name_str, ext_value_str).ToLocalChecked().IsEmpty()) {
-        return env->ThrowError("Failed to set the property on the object");
+    if (your_object->Set(env->context(), ext_name_str, ext_value_str)
+            .ToLocalChecked()
+            .IsEmpty()) {
+      return env->ThrowError("Failed to set the property on the object");
     }
   }
 
