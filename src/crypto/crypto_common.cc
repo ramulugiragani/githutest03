@@ -553,11 +553,11 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
       continue;
     }
 
-    Local<String> ext_value_str = String::NewFromUtf8(env->isolate(),
-                                                      ext_value_buf,
-                                                      NewStringType::kNormal,
-                                                      ext_value_len)
-                                      .ToLocalChecked();
+    v8::Isolate* isolate = env->isolate();
+    v8::Local<v8::String> ext_value_str = v8::String::NewExternal(
+        isolate, 
+        new v8::ExternalStringResourceImpl(ext_value_buf, ext_value_len)
+    );
 
     BIO_free(ext_bio);
 
