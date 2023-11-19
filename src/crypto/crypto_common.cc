@@ -565,11 +565,11 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
 
     BIO_free(ext_bio);
 
-    extensions
-        ->Set(env->context(),
-              String::NewFromUtf8(env->isolate(), ext_name).ToLocalChecked(),
-              ext_value_str)
-        .IsNothing();
+    v8::Local<v8::String> ext_name_str = String::NewFromUtf8(env->isolate(), ext_name).ToLocalChecked();
+
+    if (your_object->Set(env->context(), ext_name_str, ext_value_str).ToLocalChecked().IsEmpty()) {
+        return env->ThrowError("Failed to set the property on the object");
+    }
   }
 
   return extensions;
