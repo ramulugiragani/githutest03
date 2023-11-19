@@ -533,8 +533,14 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
     continue;
 }
 
-    int result = X509V3_EXT_print(ext_bio, ext, 0, 0);
-    if (result <= 0) {
+    ASN1_OBJECT* ext_obj = X509_EXTENSION_get_object(ext);
+    int ext_nid = OBJ_obj2nid(ext_obj);
+
+    ASN1_OCTET_STRING* ext_data = X509_EXTENSION_get_data(ext);
+
+    char* ext_value = (char*)ASN1_STRING_data(ext_data);
+
+    if (ext_value == NULL) {
       BIO_free(ext_bio);
       continue;
     }
