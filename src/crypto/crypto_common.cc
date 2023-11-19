@@ -519,7 +519,15 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
     const char* ext_name =
         OBJ_nid2sn(OBJ_obj2nid(X509_EXTENSION_get_object(ext)));
 
-    BIO* ext_bio = BIO_new(BIO_s_mem());
+    static BIO* ext_bio = NULL;
+
+    // Check if the BIO has been created
+    if (ext_bio == NULL) {
+        ext_bio = BIO_new(BIO_s_mem());
+    } else {
+        // Reset the existing BIO for reuse
+        BIO_reset(ext_bio);
+    }
     if (!ext_bio) {
       continue;
     }
