@@ -528,9 +528,10 @@ MaybeLocal<Value> GetExtensions(Environment* env, X509* cert) {
         // Reset the existing BIO for reuse
         BIO_reset(ext_bio);
     }
-    if (!ext_bio) {
-      continue;
-    }
+   if (!ext_bio) {
+    CHECK(false) << "Error processing extension data for " << ext_name;
+    continue;
+}
 
     int result = X509V3_EXT_print(ext_bio, ext, 0, 0);
     if (result <= 0) {
