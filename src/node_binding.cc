@@ -39,6 +39,7 @@
   V(credentials)                                                               \
   V(encoding_binding)                                                          \
   V(errors)                                                                    \
+  V(ffi)                                                                       \
   V(fs)                                                                        \
   V(fs_dir)                                                                    \
   V(fs_event_wrap)                                                             \
@@ -328,7 +329,8 @@ DLib::DLib(const char* filename, int flags)
 
 #ifdef __POSIX__
 bool DLib::Open() {
-  handle_ = dlopen(filename_.c_str(), flags_);
+  const char* filename = filename_.length() == 0 ? nullptr : filename_.c_str();
+  handle_ = dlopen(filename, flags_);
   if (handle_ != nullptr) return true;
   errmsg_ = dlerror();
   return false;
@@ -359,6 +361,7 @@ void* DLib::GetSymbolAddress(const char* name) {
 }
 #else   // !__POSIX__
 bool DLib::Open() {
+  const char* filename = filename_.length() == 0 ? nullptr : filename_.c_str();
   int ret = uv_dlopen(filename_.c_str(), &lib_);
   if (ret == 0) {
     handle_ = static_cast<void*>(lib_.handle);

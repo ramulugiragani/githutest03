@@ -105,6 +105,7 @@
       'src/node_env_var.cc',
       'src/node_errors.cc',
       'src/node_external_reference.cc',
+      'src/node_ffi.cc',
       'src/node_file.cc',
       'src/node_http_parser.cc',
       'src/node_http2.cc',
@@ -144,6 +145,7 @@
       'src/node_worker.cc',
       'src/node_zlib.cc',
       'src/permission/child_process_permission.cc',
+      'src/permission/ffi_permission.cc',
       'src/permission/fs_permission.cc',
       'src/permission/inspector_permission.cc',
       'src/permission/permission.cc',
@@ -221,6 +223,7 @@
       'src/node_errors.h',
       'src/node_exit_code.h',
       'src/node_external_reference.h',
+      'src/node_ffi.h',
       'src/node_file.h',
       'src/node_file-inl.h',
       'src/node_http_common.h',
@@ -265,6 +268,7 @@
       'src/node_watchdog.h',
       'src/node_worker.h',
       'src/permission/child_process_permission.h',
+      'src/permission/ffi_permission.h',
       'src/permission/fs_permission.h',
       'src/permission/inspector_permission.h',
       'src/permission/permission.h',
@@ -821,6 +825,7 @@
         'deps/simdjson/simdjson.gyp:simdjson',
         'deps/simdutf/simdutf.gyp:simdutf',
         'deps/ada/ada.gyp:ada',
+        'deps/libffi/libffi.gyp:libffi',
         'node_js2c#host',
       ],
 
@@ -1053,6 +1058,7 @@
         'deps/simdjson/simdjson.gyp:simdjson',
         'deps/simdutf/simdutf.gyp:simdutf',
         'deps/ada/ada.gyp:ada',
+        'deps/libffi/libffi.gyp:libffi',
       ],
 
       'includes': [
@@ -1129,6 +1135,7 @@
         'deps/histogram/histogram.gyp:histogram',
         'deps/uvwasi/uvwasi.gyp:uvwasi',
         'deps/ada/ada.gyp:ada',
+        'deps/libffi/libffi.gyp:libffi',
       ],
 
       'includes': [
@@ -1240,6 +1247,7 @@
         'deps/histogram/histogram.gyp:histogram',
         'deps/uvwasi/uvwasi.gyp:uvwasi',
         'deps/ada/ada.gyp:ada',
+        'deps/libffi/libffi.gyp:libffi',
       ],
 
       'includes': [
