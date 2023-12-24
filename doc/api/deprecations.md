@@ -3569,22 +3569,6 @@ Calling `Hash` class directly with `Hash()` or `new Hash()` is
 deprecated due to being internals, not intended for public use.
 Please use the [`crypto.createHash()`][] method to create Hash instances.
 
-### DEP0180: `process.nextTick`
-
-<!-- YAML
-changes:
-  - version: REPLACEME
-    pr-url: https://github.com/nodejs/node/pull/51280
-    description: Documentation-only deprecation.
--->
-
-Type: Documentation-only
-
-The [`process.nextTick()`][] API is deprecated due to performance
-issues with async callbacks and unpredictable behavior
-in promise and async/await scenarios.
-Please use [`queueMicrotask()`][] instead.
-
 [NIST SP 800-38D]: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
 [RFC 6066]: https://tools.ietf.org/html/rfc6066#section-3
 [RFC 8247 Section 2.4]: https://www.rfc-editor.org/rfc/rfc8247#section-2.4
@@ -3677,9 +3661,7 @@ Please use [`queueMicrotask()`][] instead.
 [`process.exitCode`]: process.md#processexitcode_1
 [`process.getActiveResourcesInfo()`]: process.md#processgetactiveresourcesinfo
 [`process.mainModule`]: process.md#processmainmodule
-[`process.nextTick()`]: process.md#processnexttickcallback-args
 [`punycode`]: punycode.md
-[`queueMicrotask()`]: globals.md#queuemicrotaskcallback
 [`readable.readableEnded`]: stream.md#readablereadableended
 [`request.abort()`]: http.md#requestabort
 [`request.connection`]: http.md#requestconnection
