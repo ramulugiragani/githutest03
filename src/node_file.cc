@@ -38,6 +38,7 @@
 #include "req_wrap-inl.h"
 #include "stream_base-inl.h"
 #include "string_bytes.h"
+#include "v8-fast-api-calls.h"
 
 #if defined(__MINGW32__) || defined(_MSC_VER)
 # include <io.h>
@@ -51,6 +52,8 @@ using v8::Array;
 using v8::BigInt;
 using v8::Context;
 using v8::EscapableHandleScope;
+using v8::FastApiCallbackOptions;
+using v8::FastOneByteString;
 using v8::Function;
 using v8::FunctionCallbackInfo;
 using v8::FunctionTemplate;
@@ -1050,6 +1053,34 @@ static void InternalModuleStat(const FunctionCallbackInfo<Value>& args) {
 
   args.GetReturnValue().Set(rc);
 }
+
+static int32_t FastInternalModuleStat(
+    Local<Object> recv,
+    const FastOneByteString& input,
+    // NOLINTNEXTLINE(runtime/references) This is V8 api.
+    FastApiCallbackOptions& options) {
+  Environment* env = Environment::GetCurrent(recv->GetCreationContextChecked());
+
+  std::string_view path(input.data, input.length);
+  if (UNLIKELY(!env->permission()->is_granted(
+          permission::PermissionScope::kFileSystemRead, path))) {
+    options.fallback = true;
+    return -1;
+  }
+
+  uv_fs_t req;
+  int rc = uv_fs_stat(env->event_loop(), &req, path.data(), nullptr);
+  if (rc == 0) {
+    const uv_stat_t* const s = static_cast<const uv_stat_t*>(req.ptr);
+    rc = !!(s->st_mode & S_IFDIR);
+  }
+  uv_fs_req_cleanup(&req);
+
+  return rc;
+}
+
+v8::CFunction fast_internal_module_stat_(
+    v8::CFunction::Make(FastInternalModuleStat));
 
 constexpr bool is_uv_error_except_no_entry(int result) {
   return result < 0 && result != UV_ENOENT;
@@ -3145,7 +3176,11 @@ static void CreatePerIsolateProperties(IsolateData* isolate_data,
   SetMethod(isolate, target, "rmdir", RMDir);
   SetMethod(isolate, target, "mkdir", MKDir);
   SetMethod(isolate, target, "readdir", ReadDir);
-  SetMethod(isolate, target, "internalModuleStat", InternalModuleStat);
+  SetFastMethod(isolate,
+                target,
+                "internalModuleStat",
+                InternalModuleStat,
+                &fast_internal_module_stat_);
   SetMethod(isolate, target, "stat", Stat);
   SetMethod(isolate, target, "lstat", LStat);
   SetMethod(isolate, target, "fstat", FStat);
@@ -3266,6 +3301,8 @@ void RegisterExternalReferences(ExternalReferenceRegistry* registry) {
   registry->Register(MKDir);
   registry->Register(ReadDir);
   registry->Register(InternalModuleStat);
+  registry->Register(FastInternalModuleStat);
+  registry->Register(fast_internal_module_stat_.GetTypeInfo());
   registry->Register(Stat);
   registry->Register(LStat);
   registry->Register(FStat);
