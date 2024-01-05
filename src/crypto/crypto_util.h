@@ -56,12 +56,15 @@ constexpr size_t kSizeOf_HMAC_CTX = 32;
 // Define smart pointers for the most commonly used OpenSSL types:
 using X509Pointer = DeleteFnPtr<X509, X509_free>;
 using BIOPointer = DeleteFnPtr<BIO, BIO_free_all>;
+using OsslLibCtxPointer = DeleteFnPtr<OSSL_LIB_CTX, OSSL_LIB_CTX_free>;
 using SSLCtxPointer = DeleteFnPtr<SSL_CTX, SSL_CTX_free>;
 using SSLSessionPointer = DeleteFnPtr<SSL_SESSION, SSL_SESSION_free>;
 using SSLPointer = DeleteFnPtr<SSL, SSL_free>;
 using PKCS8Pointer = DeleteFnPtr<PKCS8_PRIV_KEY_INFO, PKCS8_PRIV_KEY_INFO_free>;
 using EVPKeyPointer = DeleteFnPtr<EVP_PKEY, EVP_PKEY_free>;
 using EVPKeyCtxPointer = DeleteFnPtr<EVP_PKEY_CTX, EVP_PKEY_CTX_free>;
+using EVPKdfPointer = DeleteFnPtr<EVP_KDF, EVP_KDF_free>;
+using EVPKdfCtxPointer = DeleteFnPtr<EVP_KDF_CTX, EVP_KDF_CTX_free>;
 using EVPMDPointer = DeleteFnPtr<EVP_MD_CTX, EVP_MD_CTX_free>;
 using RSAPointer = DeleteFnPtr<RSA, RSA_free>;
 using ECPointer = DeleteFnPtr<EC_KEY, EC_KEY_free>;
@@ -793,6 +796,14 @@ v8::Maybe<bool> SetEncodedValue(
     int size = 0);
 
 bool SetRsaOaepLabel(const EVPKeyCtxPointer& rsa, const ByteSource& label);
+
+struct MaxThreadsScope final {
+  MaxThreadsScope(OSSL_LIB_CTX* ctx, uint64_t threads);
+  ~MaxThreadsScope();
+
+  OSSL_LIB_CTX* ctx;
+  bool success;
+};
 
 namespace Util {
 void Initialize(Environment* env, v8::Local<v8::Object> target);
