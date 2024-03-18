@@ -38,18 +38,6 @@ This feature simplifies two core workflows:
 
 ## Workflows
 
-### Enabling the feature
-
-Due to its experimental status, Corepack currently needs to be explicitly
-enabled to have any effect. To do that, run [`corepack enable`][], which
-will set up the symlinks in your environment next to the `node` binary
-(and overwrite the existing symlinks if necessary).
-
-From this point forward, any call to the [supported binaries][] will work
-without further setup. Should you experience a problem, run
-[`corepack disable`][] to remove the proxies from your system (and consider
-opening an issue on the [Corepack repository][] to let us know).
-
 ### Configuring a package
 
 The Corepack proxies will find the closest [`package.json`][] file in your
@@ -138,13 +126,11 @@ install. To avoid this problem, consider one of the following options:
 [Corepack repository]: https://github.com/nodejs/corepack
 [Yarn]: https://yarnpkg.com
 [`"packageManager"`]: packages.md#packagemanager
-[`corepack disable`]: https://github.com/nodejs/corepack#corepack-disable--name
 [`corepack enable`]: https://github.com/nodejs/corepack#corepack-enable--name
 [`corepack install`]: https://github.com/nodejs/corepack#corepack-install--g--global---all--nameversion
 [`corepack pack`]: https://github.com/nodejs/corepack#corepack-pack---all--nameversion
 [`corepack use`]: https://github.com/nodejs/corepack#corepack-use-nameversion
 [`package.json`]: packages.md#nodejs-packagejson-field-definitions
 [pnpm]: https://pnpm.js.org
-[supported binaries]: #supported-package-managers
 [supported package manager]: #supported-package-managers
 [various flags]: https://github.com/nodejs/corepack#utility-commands
