@@ -2263,7 +2263,7 @@ else:
 if options.compile_commands_json:
   gyp_args += ['-f', 'compile_commands_json']
   if sys.platform != 'win32':
-    os.path.islink('./compile_commands.json') and os.unlink('./compile_commands.json')
+    os.path.lexists('./compile_commands.json') and os.unlink('./compile_commands.json')
     os.symlink('./out/' + config['BUILDTYPE'] + '/compile_commands.json', './compile_commands.json')
 
 # pass the leftover non-whitespace positional arguments to GYP
