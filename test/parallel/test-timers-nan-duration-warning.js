@@ -13,7 +13,7 @@ function timerNotCanceled() {
 
 const testCases = ['timeout', 'interval', 'refresh'];
 
-function runTest() {
+function runTests() {
   const args = process.argv.slice(2);
 
   const testChoice = args[0];
@@ -39,25 +39,19 @@ function runTest() {
   }
 
   if (args[0] === testCases[0]) {
-    {
-      const timeout = setTimeout(timerNotCanceled, NOT_A_NUMBER);
-      clearTimeout(timeout);
-    }
+    const timeout = setTimeout(timerNotCanceled, NOT_A_NUMBER);
+    clearTimeout(timeout);
   }
 
   if (args[0] === testCases[1]) {
-    {
-      const interval = setInterval(timerNotCanceled, NOT_A_NUMBER);
-      clearInterval(interval);
-    }
+    const interval = setInterval(timerNotCanceled, NOT_A_NUMBER);
+    clearInterval(interval);
   }
 
   if (args[0] === testCases[2]) {
-    {
-      const timeout = setTimeout(timerNotCanceled, NOT_A_NUMBER);
-      timeout.refresh();
-      clearTimeout(timeout);
-    }
+    const timeout = setTimeout(timerNotCanceled, NOT_A_NUMBER);
+    timeout.refresh();
+    clearTimeout(timeout);
   }
 
   process.on(
@@ -70,4 +64,4 @@ function runTest() {
   );
 }
 
-runTest();
+runTests();
