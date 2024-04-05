@@ -214,6 +214,20 @@ inline v8::Local<v8::String> OneByteString(v8::Isolate* isolate,
       .ToLocalChecked();
 }
 
+v8::MaybeLocal<v8::String> StringViewToV8String(
+    v8::Isolate* isolate,
+    v8_inspector::StringView string) {
+  if (string.is8Bit()) {
+    return v8::String::NewFromOneByte(isolate,
+                                      string.characters8(),
+                                      v8::NewStringType::kNormal,
+                                      string.length());
+  }
+  return v8::String::NewFromTwoByte(isolate, string.characters16(),
+                                    v8::NewStringType::kNormal,
+                                    string.length());
+}
+
 void SwapBytes16(char* data, size_t nbytes) {
   CHECK_EQ(nbytes % 2, 0);
 

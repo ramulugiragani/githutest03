@@ -26,6 +26,7 @@
 
 #include "uv.h"
 #include "v8.h"
+#include "v8-inspector.h"
 
 #include "node.h"
 #include "node_exit_code.h"
@@ -353,6 +354,10 @@ inline v8::Local<v8::String> FIXED_ONE_BYTE_STRING(
   return OneByteString(isolate, arr.data(), N - 1);
 }
 
+// Convenience wrapper to handle both one- and two-byte inspector strings.
+inline v8::MaybeLocal<v8::String> StringViewToV8String(
+    v8::Isolate* isolate,
+    v8_inspector::StringView string);
 
 
 // Swaps bytes in place. nbytes is the number of bytes to swap and must be a
