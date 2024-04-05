@@ -25,8 +25,8 @@
 #if defined(NODE_WANT_INTERNALS) && NODE_WANT_INTERNALS
 
 #include "uv.h"
-#include "v8.h"
 #include "v8-inspector.h"
+#include "v8.h"
 
 #include "node.h"
 #include "node_exit_code.h"
@@ -356,9 +356,7 @@ inline v8::Local<v8::String> FIXED_ONE_BYTE_STRING(
 
 // Convenience wrapper to handle both one- and two-byte inspector strings.
 inline v8::MaybeLocal<v8::String> StringViewToV8String(
-    v8::Isolate* isolate,
-    v8_inspector::StringView string);
-
+    v8::Isolate* isolate, v8_inspector::StringView string);
 
 // Swaps bytes in place. nbytes is the number of bytes to swap and must be a
 // multiple of the word size (checked by function).
