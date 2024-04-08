@@ -214,20 +214,6 @@ inline v8::Local<v8::String> OneByteString(v8::Isolate* isolate,
       .ToLocalChecked();
 }
 
-v8::MaybeLocal<v8::String> StringViewToV8String(
-    v8::Isolate* isolate, v8_inspector::StringView string) {
-  if (string.is8Bit()) {
-    return v8::String::NewFromOneByte(isolate,
-                                      string.characters8(),
-                                      v8::NewStringType::kNormal,
-                                      string.length());
-  }
-  return v8::String::NewFromTwoByte(isolate,
-                                    string.characters16(),
-                                    v8::NewStringType::kNormal,
-                                    string.length());
-}
-
 void SwapBytes16(char* data, size_t nbytes) {
   CHECK_EQ(nbytes % 2, 0);
 
@@ -452,6 +438,31 @@ v8::MaybeLocal<v8::Value> ToV8Value(v8::Local<v8::Context> context,
 
   return v8::String::NewFromUtf8(
              isolate, str.data(), v8::NewStringType::kNormal, str.size())
+      .FromMaybe(v8::Local<v8::String>());
+}
+
+v8::MaybeLocal<v8::Value> ToV8Value(v8::Local<v8::Context> context,
+                                    v8_inspector::StringView str,
+                                    v8::Isolate* isolate) {
+  if (isolate == nullptr) isolate = context->GetIsolate();
+  if (UNLIKELY(str.length() >= static_cast<size_t>(v8::String::kMaxLength))) {
+    // V8 only has a TODO comment about adding an exception when the maximum
+    // string size is exceeded.
+    ThrowErrStringTooLong(isolate);
+    return v8::MaybeLocal<v8::Value>();
+  }
+
+  if (str.is8Bit()) {
+    return v8::String::NewFromOneByte(isolate,
+                                      str.characters8(),
+                                      v8::NewStringType::kNormal,
+                                      str.length())
+        .FromMaybe(v8::Local<v8::String>());
+  }
+  return v8::String::NewFromTwoByte(isolate,
+                                    str.characters16(),
+                                    v8::NewStringType::kNormal,
+                                    str.length())
       .FromMaybe(v8::Local<v8::String>());
 }
 
