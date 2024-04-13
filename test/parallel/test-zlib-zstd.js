@@ -4,7 +4,7 @@ const fixtures = require('../common/fixtures');
 const assert = require('assert');
 const zlib = require('zlib');
 
-// Test some brotli-specific properties of the brotli streams that can not
+// Test some zstd-specific properties of the zstd streams that can not
 // be easily covered through expanding zlib-only tests.
 
 const sampleBuffer = fixtures.readSync('/pss-vectors.json');

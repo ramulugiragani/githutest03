@@ -324,8 +324,8 @@ class ZstdCompressContext final : public ZstdContext {
   CompressionError ResetStream();
 
   // Zstd specific:
-  CompressionError Init();
-  CompressionError SetParameter(int key, uint32_t value);
+  CompressionError Init(uint64_t pledged_src_size);
+  CompressionError SetParameter(int key, int value);
 
   // Wrap ZSTD_freeCCtx to remove the return type.
   static void FreeCCtx(ZSTD_CCtx* cctx) { ZSTD_freeCCtx(cctx); }
@@ -336,6 +336,8 @@ class ZstdCompressContext final : public ZstdContext {
 
  private:
   DeleteFnPtr<ZSTD_CCtx, ZstdCompressContext::FreeCCtx> cctx_;
+
+  uint64_t pledged_src_size_ = ZSTD_CONTENTSIZE_UNKNOWN;
 };
 
 class ZstdDecompressContext final : public ZstdContext {
@@ -347,8 +349,8 @@ class ZstdDecompressContext final : public ZstdContext {
   CompressionError ResetStream();
 
   // Zstd specific:
-  CompressionError Init();
-  CompressionError SetParameter(int key, uint32_t value);
+  CompressionError Init(uint64_t pledged_src_size);
+  CompressionError SetParameter(int key, int value);
 
   // Wrap ZSTD_freeDCtx to remove the return type.
   static void FreeDCtx(ZSTD_DCtx* dctx) { ZSTD_freeDCtx(dctx); }
@@ -860,19 +862,37 @@ class ZstdStream final : public CompressionStream<CompressionContext> {
   }
 
   static void Init(const FunctionCallbackInfo<Value>& args) {
-    CHECK(args.Length() == 3 && "init(params, writeResult, writeCallback)");
+    Environment* env = Environment::GetCurrent(args);
+    Local<Context> context = env->context();
+
+    CHECK(args.Length() == 4 &&
+          "init(params, pledgedSrcSize, writeResult, writeCallback)");
     ZstdStream* wrap;
     ASSIGN_OR_RETURN_UNWRAP(&wrap, args.Holder());
 
-    CHECK(args[1]->IsUint32Array());
-    uint32_t* write_result = reinterpret_cast<uint32_t*>(Buffer::Data(args[1]));
+    CHECK(args[2]->IsUint32Array());
+    uint32_t* write_result = reinterpret_cast<uint32_t*>(Buffer::Data(args[2]));
 
-    CHECK(args[2]->IsFunction());
-    Local<Function> write_js_callback = args[2].As<Function>();
+    CHECK(args[3]->IsFunction());
+    Local<Function> write_js_callback = args[3].As<Function>();
     wrap->InitStream(write_result, write_js_callback);
 
+    uint64_t pledged_src_size = ZSTD_CONTENTSIZE_UNKNOWN;
+    if (args[1]->IsNumber()) {
+      int64_t signed_pledged_src_size;
+      if (!args[1]->IntegerValue(context).To(&signed_pledged_src_size)) {
+        args.GetReturnValue().Set(false);
+        return;
+      }
+      if (signed_pledged_src_size < 0) {
+        args.GetReturnValue().Set(false);
+        return;
+      }
+      pledged_src_size = signed_pledged_src_size;
+    }
+
     AllocScope alloc_scope(wrap);
-    CompressionError err = wrap->context()->Init();
+    CompressionError err = wrap->context()->Init(pledged_src_size);
     if (err.IsError()) {
       wrap->EmitError(err);
       args.GetReturnValue().Set(false);
@@ -1469,7 +1489,7 @@ CompressionError ZstdContext::GetErrorInfo() const {
   }
 }
 
-CompressionError ZstdCompressContext::SetParameter(int key, uint32_t value) {
+CompressionError ZstdCompressContext::SetParameter(int key, int value) {
   size_t result = ZSTD_CCtx_setParameter(
       cctx_.get(), static_cast<ZSTD_cParameter>(key), value);
   if (ZSTD_isError(result)) {
@@ -1479,18 +1499,24 @@ CompressionError ZstdCompressContext::SetParameter(int key, uint32_t value) {
   return CompressionError{};
 }
 
-CompressionError ZstdCompressContext::Init() {
+CompressionError ZstdCompressContext::Init(uint64_t pledged_src_size) {
+  pledged_src_size_ = pledged_src_size;
   cctx_.reset(ZSTD_createCCtx());
   if (!cctx_) {
     return CompressionError("Could not initialize zstd instance",
                             "ERR_ZLIB_INITIALIZATION_FAILED",
                             -1);
   }
+  size_t result = ZSTD_CCtx_setPledgedSrcSize(cctx_.get(), pledged_src_size);
+  if (ZSTD_isError(result)) {
+    return CompressionError(
+        "Could not set pledged src size", "ERR_ZLIB_INITIALIZATION_FAILED", -1);
+  }
   return CompressionError{};
 }
 
 CompressionError ZstdCompressContext::ResetStream() {
-  return Init();
+  return Init(pledged_src_size_);
 }
 
 void ZstdCompressContext::DoThreadPoolWork() {
@@ -1504,7 +1530,7 @@ void ZstdCompressContext::DoThreadPoolWork() {
   }
 }
 
-CompressionError ZstdDecompressContext::SetParameter(int key, uint32_t value) {
+CompressionError ZstdDecompressContext::SetParameter(int key, int value) {
   size_t result = ZSTD_DCtx_setParameter(
       dctx_.get(), static_cast<ZSTD_dParameter>(key), value);
   if (ZSTD_isError(result)) {
@@ -1514,7 +1540,7 @@ CompressionError ZstdDecompressContext::SetParameter(int key, uint32_t value) {
   return CompressionError{};
 }
 
-CompressionError ZstdDecompressContext::Init() {
+CompressionError ZstdDecompressContext::Init(uint64_t pledged_src_size) {
   dctx_.reset(ZSTD_createDCtx());
   if (!dctx_) {
     return CompressionError("Could not initialize zstd instance",
@@ -1525,7 +1551,9 @@ CompressionError ZstdDecompressContext::Init() {
 }
 
 CompressionError ZstdDecompressContext::ResetStream() {
-  return Init();
+  // We pass ZSTD_CONTENTSIZE_UNKNOWN because the argument is ignored for
+  // decompression.
+  return Init(ZSTD_CONTENTSIZE_UNKNOWN);
 }
 
 void ZstdDecompressContext::DoThreadPoolWork() {

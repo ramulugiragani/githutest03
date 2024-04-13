@@ -533,6 +533,12 @@ The most important options are:
   * Set compression parameters according to pre-defined cLevel table. Default
     level is ZSTD\_CLEVEL\_DEFAULT==3.
 
+#### Pledged Source Size
+
+It's possible to specify the expected total size of the uncompressed input via
+`opts.pledgedSrcSize`. If the size doesn't match at the end of the input,
+compression will fail with the code `ZSTD_error_srcSize_wrong`.
+
 #### Decompressor options
 
 These advanced options are available for controlling decompression:
