@@ -62,8 +62,8 @@ requesting promotion.
 
 We trust ambasaddors to only request promotion of content that lines
 up with the messages and topics outlined, that this content does not overly
-market their employer, and that they have followed the review process.
-An abassador can request promotion of content in the following ways:
+market their employer or product/business, and that they have followed the review
+process. An abassador can request promotion of content in the following ways:
 
 * Requesting that a tweet be retweeted by the Node.js twitter account.
 * Requesting that a linkedin in post be reposted by the Node.js linkedin
