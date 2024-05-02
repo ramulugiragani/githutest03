@@ -1,21 +1,20 @@
 # Advocacy Ambassador program
 
-The project aims to support and encourage developer advocates to
-promote Node.js as a project and to help communicate key messages to their
-constituencies.
+The project aims to support and encourage developers and developer
+advocates to promote Node.js as a project and to help communicate
+key messages to their constituencies.
 
 The ambassador program does that by:
 
-* Maintaining an up to date set of messages that it would like developer
-  advocates to promote. These will be documented in the nodejs/ambassadors
-  repository.
+* Maintaining an up to date set of messages that it would like abassadors
+  to promote. These will be documented in the nodejs/ambassadors repository.
 * Maintaining an up to date set of topics on which additional content
   would benefit the community. These will be documented in the
   nodejs/ambassadors repository.
 * Providing a space for collaborators to share new topics/features they
   are working on, when they would be happy for ambassadors to help share and get
   early feedback.
-* Helping developer advocates promote content that aligns with the
+* Helping ambassadors promote content that aligns with the
   messages and topics defined through social media and other channels.
 * Advocating for ambasadors to be part of the OpenJS speakers bureau, even if the
   abmassador is not otherwise and active member of the project itself.
