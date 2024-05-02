@@ -76,4 +76,6 @@ process. An abassador can request promotion of content in the following ways:
 Requests for a retweet or Linkedin repost will be done by the foundation
 staff without any need for validation based on the request coming from
 an ambassador. These requests can be made through the existing social channel
-in the OpenJS slack.
+in the OpenJS slack. For that reason and for communication purposes and
+collaboration opportunities ambassadors should be a member of the
+[OpenJS slack](https://slack-invite.openjsf.org/)
