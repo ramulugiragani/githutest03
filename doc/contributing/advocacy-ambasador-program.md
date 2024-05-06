@@ -17,7 +17,7 @@ The ambassador program does that by:
 * Helping ambassadors promote content that aligns with the
   messages and topics defined through social media and other channels.
 * Advocating for ambasadors to be part of the OpenJS speakers bureau, even if the
-  abmassador is not otherwise and active member of the project itself.
+  ambassador is not otherwise and active member of the project itself.
 
 ## Abassadors nominations
 
