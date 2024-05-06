@@ -60,7 +60,7 @@ requesting promotion.
 
 ## Promoting content
 
-We trust ambasaddors to only request promotion of content that lines
+We trust ambassadors to only request promotion of content that lines
 up with the messages and topics outlined, that this content does not overly
 market their employer or product/business, and that they have followed the review
 process. An abassador can request promotion of content in the following ways:
