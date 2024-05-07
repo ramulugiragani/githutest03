@@ -66,7 +66,7 @@ market their employer or product/business, and that they have followed the revie
 process. An abassador can request promotion of content in the following ways:
 
 * Requesting that a tweet be retweeted by the Node.js X account.
-* Requesting that a linkedin in post be reposted by the Node.js linkedin
+* Requesting that a LinkedIn post be reposted by the Node.js LinkedIn
   account.
 * At mentioning the nodejs/ambassadors team to ask other ambassadors to
   repost
