@@ -34,7 +34,7 @@ In the initial phase of the program:
 The TSC may choose to remove an ambassador if things are not working
 out in terms of the content promoted and alignment with the project.
 
-Members of the Node.js organization can nominate ambasssadors by opening
+Members of the Node.js organization can nominate ambassadors by opening
 an issue in: TBD.
 
 ## Reviewing content
