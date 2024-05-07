@@ -6,7 +6,7 @@ key messages to their constituencies.
 
 The ambassador program does that by:
 
-* Maintaining an up to date set of messages that it would like abassadors
+* Maintaining an up-to-date set of messages that it would like ambassadors
   to promote. These will be documented in the nodejs/ambassadors repository.
 * Maintaining an up to date set of topics on which additional content
   would benefit the community. These will be documented in the
