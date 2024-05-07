@@ -63,7 +63,7 @@ requesting promotion.
 We trust ambassadors to only request promotion of content that lines
 up with the messages and topics outlined, that this content does not overly
 market their employer or product/business, and that they have followed the review
-process. An abassador can request promotion of content in the following ways:
+process. An ambassador can request promotion of content in the following ways:
 
 * Requesting that a tweet be retweeted by the Node.js X account.
 * Requesting that a LinkedIn post be reposted by the Node.js LinkedIn
