@@ -78,4 +78,4 @@ staff without any need for validation based on the request coming from
 an ambassador. These requests can be made through the existing social channel
 in the OpenJS Slack. For that reason and for communication purposes and
 collaboration opportunities ambassadors should be a member of the
-[OpenJS slack](https://slack-invite.openjsf.org/)
+[OpenJS Slack](https://slack-invite.openjsf.org/)
