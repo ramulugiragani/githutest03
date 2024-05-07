@@ -19,7 +19,7 @@ The ambassador program does that by:
 * Advocating for ambasadors to be part of the OpenJS speakers bureau, even if the
   ambassador is not otherwise and active member of the project itself.
 
-## Abassadors nominations
+## Ambassadors nominations
 
 Any member of the Node.js organization may nominate an ambassador.
 The Technical Steering Committee (TSC) will review/approve ambassadors.
