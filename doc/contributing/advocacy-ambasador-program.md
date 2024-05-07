@@ -31,7 +31,7 @@ In the initial phase of the program:
   drop out of the ambassador list and must be re-nominated
 * ambassadors will be documented on the nodejs/ambassadors README.md
 
-The TSC may chose to remove an ambassador if things are not working
+The TSC may choose to remove an ambassador if things are not working
 out in terms of the content promoted and alignment with the project.
 
 Members of the Node.js organization can nominate ambasssadors by opening
