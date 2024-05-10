@@ -58,6 +58,15 @@ Explicit approval is not required in the issue (ie if there is zero
 input that's ok), but objections should addressed before
 requesting promotion.
 
+## Expectations on Ambassadors
+
+Ambassadors are expected to engage both within the project and externally
+in a manner that is consistent with the projects
+[Code of Conduct](https://github.com/nodejs/admin/blob/main/CODE_OF_CONDUCT.md)
+as well as the additional expectations outlined in
+[MemberExpectations](https://github.com/nodejs/admin/blob/main/MemberExpectations.md)
+for a leadership position.
+
 ## Promoting content
 
 We trust ambassadors to only request promotion of content that lines
