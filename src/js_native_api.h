@@ -118,6 +118,16 @@ NAPI_EXTERN napi_status NAPI_CDECL node_api_create_property_key_utf16(
     napi_env env, const char16_t* str, size_t length, napi_value* result);
 #endif  // NAPI_EXPERIMENTAL
 
+#ifdef NAPI_EXPERIMENTAL
+#define NODE_API_EXPERIMENTAL_HAS_PROPERTY_KEYS
+NAPI_EXTERN napi_status NAPI_CDECL
+napi_set_named_property_len(napi_env env,
+                            napi_value object,
+                            const char* utf8name,
+                            size_t name_length,
+                            napi_value value);
+#endif  // NAPI_EXPERIMENTAL
+
 NAPI_EXTERN napi_status NAPI_CDECL napi_create_symbol(napi_env env,
                                                       napi_value description,
                                                       napi_value* result);

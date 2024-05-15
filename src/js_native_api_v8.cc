@@ -1718,6 +1718,24 @@ napi_status NAPI_CDECL node_api_create_property_key_utf16(napi_env env,
   });
 }
 
+napi_status NAPI_CDECL napi_set_named_property_len(napi_env env,
+                                                   napi_value object,
+                                                   const char* utf8name,
+                                                   size_t name_length,
+                                                   napi_value value) {
+  std::u16string utf16name;
+  napi_status status =
+      CHECK_NEW_FROM_UTF8_LEN(env, utf8name, name_length, &utf16name);
+  if (status != napi_ok) {
+      return status;
+  }
+
+  status = napi_set_named_property(
+      env, object, utf16name.data(), utf16name.length(), value);
+
+  return status;
+}
+
 napi_status NAPI_CDECL napi_create_double(napi_env env,
                                           double value,
                                           napi_value* result) {

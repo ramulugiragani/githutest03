@@ -310,6 +310,59 @@ static napi_value TestPropertyKeyUtf16AutoLength(napi_env env,
                          auto_length);
 }
 
+static napi_value TestSetNamedPropertyLen(napi_env env, napi_callback_info info) {
+  size_t argc = 0;
+  napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
+
+  if (argc < 1) {
+    napi_throw_error(env, nullptr, "Invalid number of arguments");
+    return nullptr;
+  }
+
+  napi_value object;
+  napi_create_object(env, &object);
+
+  const char* key = "\0test";
+  napi_value value;
+  napi_create_int32(env, 42, &value);
+
+  napi_status status =
+      napi_set_named_property_len(env, object, key, strlen(key), value);
+  if (status != napi_ok) {
+    napi_throw_error(env, nullptr, "Failed to set named property");
+    return nullptr;
+  }
+
+  return object;
+}
+
+static napi_value TestSetNamedPropertyLenAutoLength(napi_env env,
+                                                    napi_callback_info info) {
+  size_t argc = 0;
+  napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
+
+  if (argc < 1) {
+    napi_throw_error(env, nullptr, "Invalid number of arguments");
+    return nullptr;
+  }
+
+  napi_value object;
+  napi_create_object(env, &object);
+
+  const char* key = "\0test";
+  napi_value value;
+  napi_create_int32(env, 42, &value);
+
+  napi_status status =
+      napi_set_named_property_len(env, object, key, strlen(key), value);
+  if (status != napi_ok) {
+    napi_throw_error(env, nullptr, "Failed to set named property");
+    return nullptr;
+  }
+
+  return object;
+}
+
 static napi_value Utf16Length(napi_env env, napi_callback_info info) {
   napi_value args[1];
   NODE_API_CALL(env, validate_and_retrieve_single_string_arg(env, info, args));
