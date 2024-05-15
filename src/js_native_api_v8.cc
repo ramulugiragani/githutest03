@@ -1727,7 +1727,7 @@ napi_status NAPI_CDECL napi_set_named_property_len(napi_env env,
   napi_status status =
       CHECK_NEW_FROM_UTF8_LEN(env, utf8name, name_length, &utf16name);
   if (status != napi_ok) {
-      return status;
+    return status;
   }
 
   status = napi_set_named_property(

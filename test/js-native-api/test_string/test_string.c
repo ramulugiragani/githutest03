@@ -310,7 +310,8 @@ static napi_value TestPropertyKeyUtf16AutoLength(napi_env env,
                          auto_length);
 }
 
-static napi_value TestSetNamedPropertyLen(napi_env env, napi_callback_info info) {
+static napi_value TestSetNamedPropertyLen(napi_env env,
+                                          napi_callback_info info) {
   size_t argc = 0;
   napi_get_cb_info(env, info, &argc, nullptr, nullptr, nullptr);
 
