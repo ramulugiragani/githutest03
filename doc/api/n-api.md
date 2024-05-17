@@ -3134,7 +3134,7 @@ overhead in creating/storing strings with this method.
 The JavaScript `string` type is described in
 [Section 6.1.4][] of the ECMAScript Language Specification.
 
-#### `napi_set_named_property_len`
+#### `node_api_set_named_property_len`
 
 <!-- YAML
 added:
@@ -3144,7 +3144,7 @@ added:
 > **Stability**: 1 - Experimental
 
 ```c
-napi_status NAPI_CDECL napi_set_named_property_len(napi_env env,
+napi_status NAPI_CDECL node_api_set_named_property_len(napi_env env,
                                                    napi_value object,
                                                    const char* utf8name,
                                                    size_t name_length,

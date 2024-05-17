@@ -328,7 +328,7 @@ static napi_value TestSetNamedPropertyLen(napi_env env,
   napi_create_int32(env, 42, &value);
 
   napi_status status =
-      napi_set_named_property_len(env, object, key, strlen(key), value);
+      node_api_set_named_property_len(env, object, key, strlen(key), value);
   if (status != napi_ok) {
     napi_throw_error(env, nullptr, "Failed to set named property");
     return nullptr;
@@ -355,7 +355,7 @@ static napi_value TestSetNamedPropertyLenAutoLength(napi_env env,
   napi_create_int32(env, 42, &value);
 
   napi_status status =
-      napi_set_named_property_len(env, object, key, strlen(key), value);
+      node_api_set_named_property_len(env, object, key, strlen(key), value);
   if (status != napi_ok) {
     napi_throw_error(env, nullptr, "Failed to set named property");
     return nullptr;
