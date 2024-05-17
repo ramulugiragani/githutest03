@@ -3159,9 +3159,7 @@ napi_status NAPI_CDECL napi_set_named_property_len(napi_env env,
   Returns napi\_ok if the API succeeded.
 
 This API sets a named property on a JavaScript object, treating '\0'
-characters as values rather than terminators. This allows for more
-flexible property names, especially when dealing with virtual module
-names or other scenarios where '\0' characters are used as part of the name.
+characters as values rather than terminators.
 
 ### Functions to convert from Node-API to C types
 
