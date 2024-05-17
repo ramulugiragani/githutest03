@@ -1718,6 +1718,28 @@ napi_status NAPI_CDECL node_api_create_property_key_utf16(napi_env env,
   });
 }
 
+napi_status node_api_create_property_key_utf8(napi_env env,
+                                              const char* utf8name,
+                                              size_t length,
+                                              napi_value* result) {
+  if (env == nullptr || utf8name == nullptr || result == nullptr) {
+    return napi_invalid_arg;
+  }
+
+  v8::Isolate* isolate = reinterpret_cast<napi_env__*>(env)->isolate;
+  v8::HandleScope handle_scope(isolate);
+
+  v8::Local<v8::String> key;
+  if (!v8::String::NewFromUtf8(
+           isolate, utf8name, v8::NewStringType::kNormal, length)
+           .ToLocal(&key)) {
+    return napi_generic_failure;
+  }
+
+  *result = v8impl::JsValueFromV8LocalValue(key);
+  return napi_ok;
+}
+
 napi_status NAPI_CDECL node_api_set_named_property_len(napi_env env,
                                                        napi_value object,
                                                        const char* utf8name,
