@@ -1719,10 +1719,10 @@ napi_status NAPI_CDECL node_api_create_property_key_utf16(napi_env env,
 }
 
 napi_status NAPI_CDECL node_api_set_named_property_len(napi_env env,
-                                                   napi_value object,
-                                                   const char* utf8name,
-                                                   size_t name_length,
-                                                   napi_value value) {
+                                                       napi_value object,
+                                                       const char* utf8name,
+                                                       size_t name_length,
+                                                       napi_value value) {
   std::u16string utf16name;
   napi_status status =
       CHECK_NEW_FROM_UTF8_LEN(env, utf8name, name_length, &utf16name);
