@@ -248,7 +248,7 @@ void V8ProfilerConnection::WriteProfile(simdjson::ondemand::object* result) {
 
   std::string filename = GetFilename();
   DCHECK(!filename.empty());
-  std::string path = directory + kPathSeparator + filename;
+  auto path = std::filesystem::path(directory) / filename;
 
   WriteResult(env_, path.c_str(), profile);
 }
@@ -304,7 +304,7 @@ void V8CoverageConnection::WriteProfile(simdjson::ondemand::object* result) {
 
   std::string filename = GetFilename();
   DCHECK(!filename.empty());
-  std::string path = directory + kPathSeparator + filename;
+  auto path = std::filesystem::path(directory) / filename;
 
   // Only insert source map cache when there's source map data at all.
   if (!source_map_cache_v->IsUndefined()) {

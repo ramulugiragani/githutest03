@@ -76,12 +76,6 @@ using v8::Value;
 # define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
 #endif
 
-#ifdef __POSIX__
-constexpr char kPathSeparator = '/';
-#else
-const char* const kPathSeparator = "\\/";
-#endif
-
 inline int64_t GetOffset(Local<Value> value) {
   return IsSafeJsInt(value) ? value.As<Integer>()->Value() : -1;
 }
@@ -1591,8 +1585,10 @@ int MKDirpSync(uv_loop_t* loop,
           return err;
         }
         case UV_ENOENT: {
-          std::string dirname = next_path.substr(0,
-                                        next_path.find_last_of(kPathSeparator));
+          std::string dirname =
+              next_path.substr(0,
+                               next_path.find_last_of(
+                                   std::filesystem::path::preferred_separator));
           if (dirname != next_path) {
             req_wrap->continuation_data()->PushPath(std::move(next_path));
             req_wrap->continuation_data()->PushPath(std::move(dirname));
@@ -1671,8 +1667,8 @@ int MKDirpAsync(uv_loop_t* loop,
           break;
         }
         case UV_ENOENT: {
-          std::string dirname = path.substr(0,
-                                            path.find_last_of(kPathSeparator));
+          std::string dirname = path.substr(
+              0, path.find_last_of(std::filesystem::path::preferred_separator));
           if (dirname != path) {
             req_wrap->continuation_data()->PushPath(path);
             req_wrap->continuation_data()->PushPath(std::move(dirname));

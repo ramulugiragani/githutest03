@@ -713,7 +713,8 @@ std::string Environment::GetCwd(const std::string& exec_path) {
 
   // This can fail if the cwd is deleted. In that case, fall back to
   // exec_path.
-  return exec_path.substr(0, exec_path.find_last_of(kPathSeparator));
+  return exec_path.substr(
+      0, exec_path.find_last_of(std::filesystem::path::preferred_separator));
 }
 
 void Environment::add_refs(int64_t diff) {
@@ -2064,7 +2065,8 @@ size_t Environment::NearHeapLimitCallback(void* data,
     dir = Environment::GetCwd(env->exec_path_);
   }
   DiagnosticFilename name(env, "Heap", "heapsnapshot");
-  std::string filename = dir + kPathSeparator + (*name);
+  std::string filename =
+      dir + std::filesystem::path::preferred_separator + (*name);
 
   Debug(env, DebugCategory::DIAGNOSTICS, "Start generating %s...\n", *name);
 

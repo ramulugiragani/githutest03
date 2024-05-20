@@ -4,6 +4,7 @@
 #if defined(NODE_WANT_INTERNALS) && NODE_WANT_INTERNALS
 
 #include <cinttypes>
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <unordered_map>
