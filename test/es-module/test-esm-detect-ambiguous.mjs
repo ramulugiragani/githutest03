@@ -168,7 +168,7 @@ describe('--experimental-detect-module', { concurrency: !process.env.TEST_PARALL
       });
     }
 
-    it('should hint format correctly for extensionles modules resolve hook', async () => {
+    it('should hint format correctly for the resolve hook for extensionless modules', async () => {
       let writeSync;
       const { stdout, stderr, code, signal } = await spawnPromisified(process.execPath, [
         '--experimental-detect-module',

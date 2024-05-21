@@ -781,6 +781,29 @@ describe('Loader hooks', { concurrency: !process.env.TEST_PARALLEL }, () => {
     }
   });
 
+  describe('should use ESM loaders ', async () => {
+    for (const { testConfigName, additionalOptions } of [
+      { testConfigName: 'without --experimental-detect-module', additionalOptions: [] },
+      { testConfigName: 'with --experimental-detect-module', additionalOptions: ['--experimental-detect-module'] },
+    ]) {
+      it(testConfigName, async () => {
+        const { code, signal, stdout, stderr } = await spawnPromisified(process.execPath, [
+          ...additionalOptions,
+          '--import',
+          '../es-module-loaders/builtin-named-exports.mjs',
+          fixtures.path('es-modules/require-esm-throws-with-loaders.js'),
+        ], {
+          cwd: fixtures.path('es-modules'),
+        });
+
+        assert.strictEqual(stderr, '');
+        assert.strictEqual(stdout, '');
+        assert.strictEqual(code, 0);
+        assert.strictEqual(signal, null);
+      });
+    }
+  });
+
   it('should support source maps in commonjs translator', async () => {
     const readFile = async () => {};
     const hook = `
