@@ -35,7 +35,9 @@ The TSC may choose to remove an ambassador if things are not working
 out in terms of the content promoted and alignment with the project.
 
 Members of the Node.js organization can nominate ambassadors by opening
-an issue in: TBD.
+a discussion issue with the nomination in https://github.com/nodejs/collaborators/
+titled `Nomination X to be an Ambassador`, where X is the name of the person
+being nominated.
 
 ## Reviewing content
 
