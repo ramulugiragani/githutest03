@@ -82,8 +82,8 @@ process. An ambassador can request promotion of content in the following ways:
 * Posting a link to the content in the "what's new" issue in nodejs/ambassadors
   so that it goes out on the news feed.
 
-Requests for a retweet or LinkedIn repost will be done by the foundation
-staff without any need for validation based on the request coming from
+Foundation staff will retweet or LinkedIn repost
+without any need for validation based on the request coming from
 an ambassador. These requests can be made through the existing social channel
 in the OpenJS Slack. For that reason and for communication purposes and
 collaboration opportunities ambassadors should be a member of the
