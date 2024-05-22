@@ -54,7 +54,7 @@ suggestions in the issue and the ambassadors are expected to
 consider those suggestions and update the content when they feel it
 is appropriate.
 
-Explicit approval is not required in the issue (ie if there is zero
+Explicit approval is not required in the issue (i.e. if there is no
 input that's ok), but objections should addressed before
 requesting promotion.
 
