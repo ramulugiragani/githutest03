@@ -55,7 +55,7 @@ consider those suggestions and update the content when they feel it
 is appropriate.
 
 Explicit approval is not required in the issue (i.e. if there is no
-input that's ok), but objections should addressed before
+input, that's OK), but objections should addressed before
 requesting promotion.
 
 ## Expectations on Ambassadors
