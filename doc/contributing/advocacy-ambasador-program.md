@@ -27,7 +27,7 @@ The Technical Steering Committee (TSC) will review/approve ambassadors.
 In the initial phase of the program:
 
 * there will be a maximum of 4 ambassadors
-* the term will be for the calendar year. After a year ambassadors automatically
+* the term will be for the calendar year. After a year, ambassadors automatically
   drop out of the ambassador list and must be re-nominated
 * ambassadors will be documented on the nodejs/ambassadors README.md
 
