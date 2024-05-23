@@ -1,6 +1,6 @@
 # Advocacy Ambassador program
 
-The project aims to support and encourage developers and developer
+Node.js aims to support and encourage developers and developer
 advocates to promote Node.js as a project and to help communicate
 key messages to their constituencies.
 
