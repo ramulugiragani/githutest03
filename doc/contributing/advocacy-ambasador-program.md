@@ -52,8 +52,8 @@ repository on which access is limited to members of the Node.js
 organization. The issue may include the link to existing published
 content or a draft of the content itself.
 
-Interested members of the Node.js organization may comment/make
-suggestions in the issue and the ambassadors are expected to
+Interested members of the Node.js organization may comment
+in the issue and the ambassadors are expected to
 consider those suggestions and update the content when they feel it
 is appropriate.
 
