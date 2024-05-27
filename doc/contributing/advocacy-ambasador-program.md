@@ -48,7 +48,7 @@ for collaborators to help improve content as opposed to a detailed
 nitpick review.
 
 This is done by opening an issue in the nodejs/ambassadors
-repository on which access is limited to members of the Node.js
+repository, which limits access to members of the Node.js
 organization. The issue may include the link to existing published
 content or a draft of the content itself.
 
