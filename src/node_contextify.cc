@@ -1744,7 +1744,8 @@ static void ContainsModuleSyntax(const FunctionCallbackInfo<Value>& args) {
   }
 
   bool result = ShouldRetryAsESM(realm, message, code, resource_name);
-  if (result) { // successfully parsed as ESM after failing to parse as CJS => ESM syntax
+  if (result) {
+    // successfully parsed as ESM after failing to parse as CJS => ESM syntax
     args.GetReturnValue().Set(result);
     return;
   }
