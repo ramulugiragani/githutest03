@@ -1707,10 +1707,10 @@ static void ContainsModuleSyntax(const FunctionCallbackInfo<Value>& args) {
       return;
     }
     code = String::NewFromUtf8(isolate,
-                              contents.c_str(),
-                              v8::NewStringType::kNormal,
-                              contents.length())
-              .ToLocalChecked();
+                               contents.c_str(),
+                               v8::NewStringType::kNormal,
+                               contents.length())
+               .ToLocalChecked();
   } else {
     CHECK(args[0]->IsString());
     code = args[0].As<String>();
