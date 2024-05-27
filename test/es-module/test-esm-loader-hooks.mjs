@@ -790,11 +790,9 @@ describe('Loader hooks', { concurrency: !process.env.TEST_PARALLEL }, () => {
         const { code, signal, stdout, stderr } = await spawnPromisified(process.execPath, [
           ...additionalOptions,
           '--import',
-          '../es-module-loaders/builtin-named-exports.mjs',
+          fixtures.fileURL('es-module-loaders/builtin-named-exports.mjs'),
           fixtures.path('es-modules/require-esm-throws-with-loaders.js'),
-        ], {
-          cwd: fixtures.path('es-modules'),
-        });
+        ]);
 
         assert.strictEqual(stderr, '');
         assert.strictEqual(stdout, '');
