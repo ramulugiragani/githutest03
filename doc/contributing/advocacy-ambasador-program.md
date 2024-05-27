@@ -67,8 +67,7 @@ Ambassadors are expected to engage both within the project and externally
 in a manner that is consistent with the project's
 [Code of Conduct](https://github.com/nodejs/admin/blob/main/CODE_OF_CONDUCT.md)
 as well as the additional expectations outlined in
-[Member Expectations](https://github.com/nodejs/admin/blob/main/MemberExpectations.md)
-for a leadership position.
+[Member Expectations](https://github.com/nodejs/admin/blob/main/MemberExpectations.md).
 
 ## Promoting content
 
