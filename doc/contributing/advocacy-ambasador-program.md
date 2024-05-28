@@ -12,7 +12,7 @@ The ambassador program does that by:
   would benefit the community. These will be documented in the
   nodejs/ambassadors repository.
 * Providing a space for collaborators to share new topics/features they
-  are working on, when they would be happy for ambassadors to help share and get
+  are working on when they would be happy for ambassadors to help share and get
   early feedback.
 * Helping ambassadors promote content that aligns with the
   messages and topics defined.
