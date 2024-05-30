@@ -724,8 +724,9 @@ RAIIIsolateWithoutEntering::RAIIIsolateWithoutEntering(const SnapshotData* data)
 }
 
 RAIIIsolateWithoutEntering::~RAIIIsolateWithoutEntering() {
-  isolate_->Dispose();
+  isolate_->Dispose(Isolate::IsolateDisposeFlags::kDontFree);
   per_process::v8_platform.Platform()->UnregisterIsolate(isolate_);
+  Isolate::Free(isolate_);
 }
 
 RAIIIsolate::RAIIIsolate(const SnapshotData* data)

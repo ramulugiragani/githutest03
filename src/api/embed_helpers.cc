@@ -237,14 +237,15 @@ CommonEnvironmentSetup::~CommonEnvironmentSetup() {
     }
 
     bool platform_finished = false;
-    impl_->platform->AddIsolateFinishedCallback(isolate, [](void* data) {
-      *static_cast<bool*>(data) = true;
-    }, &platform_finished);
+    impl_->platform->AddIsolateFinishedCallback(
+        isolate,
+        [](void* data) { *static_cast<bool*>(data) = true; },
+        &platform_finished);
     if (impl_->snapshot_creator.has_value())
       impl_->snapshot_creator.reset();
-    else
-      isolate->Dispose();
+    isolate->Dispose(Isolate::IsolateDisposeFlags::kDontFree);
     impl_->platform->UnregisterIsolate(isolate);
+    Isolate::Free(isolate);
 
     // Wait until the platform has cleaned up all relevant resources.
     while (!platform_finished)
