@@ -81,9 +81,11 @@ NodeMainInstance::~NodeMainInstance() {
     // This should only be done on a main instance that owns its isolate.
     // IsolateData must be freed before UnregisterIsolate() is called.
     isolate_data_.reset();
+    isolate_->Dispose(Isolate::IsolateDisposeFlags::kDontFree);
     platform_->UnregisterIsolate(isolate_);
+    Isolate::Free(isolate_);
+    // TODO(joyeecheung): split Isolate::Free() here?
   }
-  isolate_->Dispose();
 }
 
 ExitCode NodeMainInstance::Run() {
