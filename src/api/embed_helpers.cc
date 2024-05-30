@@ -123,6 +123,7 @@ CommonEnvironmentSetup::CommonEnvironmentSetup(
   }
   loop->data = this;
 
+  impl_->allocator = ArrayBufferAllocator::Create();
   Isolate* isolate;
   if (flags & Flags::kIsForSnapshotting) {
     const std::vector<intptr_t>& external_references =
@@ -131,12 +132,19 @@ CommonEnvironmentSetup::CommonEnvironmentSetup(
     // Must be done before the SnapshotCreator creation so  that the
     // memory reducer can be initialized.
     platform->RegisterIsolate(isolate, loop);
-    impl_->snapshot_creator.emplace(isolate, external_references.data());
+
+    v8::Isolate::CreateParams params;
+    SetIsolateCreateParamsForNode(&params);
+    params.cpp_heap =
+        v8::CppHeap::Create(platform, v8::CppHeapCreateParams{{}}).release();
+    params.external_references = external_references.data();
+    params.array_buffer_allocator = impl_->allocator.get();
+
+    impl_->snapshot_creator.emplace(isolate, params);
     isolate->SetCaptureStackTraceForUncaughtExceptions(
         true, 10, v8::StackTrace::StackTraceOptions::kDetailed);
     SetIsolateMiscHandlers(isolate, {});
   } else {
-    impl_->allocator = ArrayBufferAllocator::Create();
     isolate = impl_->isolate =
         NewIsolate(impl_->allocator, &impl_->loop, platform, snapshot_data);
   }
