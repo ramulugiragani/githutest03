@@ -79,8 +79,8 @@ process. An ambassador can request promotion of content in the following ways:
 * Requesting that a tweet be retweeted by the Node.js X account.
 * Requesting that a LinkedIn post be reposted by the Node.js LinkedIn
   account.
-* At mentioning the nodejs/ambassadors team to ask other ambassadors to
-  repost
+* @-mentioning the nodejs/ambassadors team to ask other ambassadors to
+  repost.
 * Posting a link to the content in the "what's new" issue in nodejs/ambassadors
   so that it goes out on the news feed.
 
