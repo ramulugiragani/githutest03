@@ -77,8 +77,7 @@ market their employer or product/business, and that they have followed the revie
 process. An ambassador can request promotion of content in the following ways:
 
 * Requesting that a tweet/post be retweeted/reposed by the Node.js account on a social media platform.
-* @-mentioning the nodejs/ambassadors team to ask other ambassadors to
-  repost.
+* @-mentioning the nodejs/ambassadors team to ask other ambassadors to repost.
 * Posting a link to the content in the "what's new" issue in nodejs/ambassadors
   so that it goes out on the news feed.
 
