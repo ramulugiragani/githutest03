@@ -13,12 +13,9 @@ async function * asyncGenerator() {
   yield '3';
 }
 
-
 {
   class NullWritable extends Writable {
     _write(c, e, cb) {
-      console.log('c: ', c);
-
       cb();
     }
   }
