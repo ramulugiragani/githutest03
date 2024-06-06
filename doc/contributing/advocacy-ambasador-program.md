@@ -26,10 +26,10 @@ The Technical Steering Committee (TSC) will review/approve ambassadors.
 
 In the initial phase of the program:
 
-* there will be a maximum of 4 ambassadors
-* the term will be for the calendar year. After a year, ambassadors automatically
-  drop out of the ambassador list and must be re-nominated
-* ambassadors will be documented on the nodejs/ambassadors README.md
+* There will be a maximum of 4 ambassadors.
+* The term will be for the calendar year. After a year, ambassadors automatically
+  drop out of the ambassador list and must be re-nominated.
+* Ambassadors will be documented on the nodejs/ambassadors `README.md`.
 
 The TSC may remove an ambassador for any reason,
 including promoting content misaligned with the project.
