@@ -993,6 +993,16 @@ following permissions are restricted:
 * Worker Threads - manageable through [`--allow-worker`][] flag
 * WASI - manageable through [`--allow-wasi`][] flag
 
+### `--experimental-repl`
+
+<!--
+added: REPLACME
+-->
+
+> Stability: 1 - Experimental
+
+Enables the experimental REPL.
+
 ### `--experimental-require-module`
 
 <!-- YAML
