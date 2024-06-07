@@ -224,6 +224,9 @@ This method has a custom variant for promises that is available using
 <!-- YAML
 added: v0.0.1
 changes:
+  - version: REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/53005
+    description: Passing `NaN` or a negative number as `delay` is deprecated.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41678
     description: Passing an invalid callback to the `callback` argument
@@ -252,6 +255,9 @@ This method has a custom variant for promises that is available using
 <!-- YAML
 added: v0.0.1
 changes:
+  - version: REPLACEME
+    pr-url: https://github.com/nodejs/node/pull/53005
+    description: Passing `NaN` or a negative number as `delay` is deprecated.
   - version: v18.0.0
     pr-url: https://github.com/nodejs/node/pull/41678
     description: Passing an invalid callback to the `callback` argument
