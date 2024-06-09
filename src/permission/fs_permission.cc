@@ -23,10 +23,10 @@ std::string WildcardIfDir(const std::string& res) noexcept {
     const uv_stat_t* const s = static_cast<const uv_stat_t*>(req.ptr);
     if ((s->st_mode & S_IFMT) == S_IFDIR) {
       // add wildcard when directory
-      if (res.back() == node::kPathSeparator) {
+      if (res.back() == std::filesystem::path::preferred_separator) {
         return res + "*";
       }
-      return res + node::kPathSeparator + "*";
+      return res + std::filesystem::path::preferred_separator + "*";
     }
   }
   uv_fs_req_cleanup(&req);

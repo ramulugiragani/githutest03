@@ -7,6 +7,7 @@
 #error("This header can only be used when inspector is enabled")
 #endif
 
+#include <filesystem>
 #include <optional>
 #include <unordered_set>
 #include "inspector_agent.h"
