@@ -103,23 +103,27 @@ The `pack` command has [various flags][]. Consult the detailed
 
 The following binaries are provided through Corepack:
 
-| Package manager | Binary names      |
-| --------------- | ----------------- |
-| [Yarn][]        | `yarn`, `yarnpkg` |
-| [pnpm][]        | `pnpm`, `pnpx`    |
+| Package manager  | Binary names      |
+| ---------------- | ----------------- |
+| [Yarn][]         | `yarn`, `yarnpkg` |
+| [pnpm][]         | `pnpm`, `pnpx`    |
+| [npm][]*         | `npm`, `npx`      |
+
+\* Not enabled by default. Use `corepack enable npm` to do so.
 
 ## Common questions
 
 ### How does Corepack interact with npm?
 
-While Corepack could support npm like any other package manager, its
-shims aren't enabled by default. This has a few consequences:
+The npm shims aren't enabled by default. This has a few consequences:
 
 * It's always possible to run a `npm` command within a project configured to
   be used with another package manager, since Corepack cannot intercept it.
 
 * While `npm` is a valid option in the [`"packageManager"`][] property, the
   lack of shim will cause the global npm to be used.
+
+You can enable shimming npm by running `corepack enable npm`.
 
 ### Running `npm install -g yarn` doesn't work
 
@@ -145,6 +149,7 @@ install. To avoid this problem, consider one of the following options:
 [`corepack use`]: https://github.com/nodejs/corepack#corepack-use-nameversion
 [`package.json`]: packages.md#nodejs-packagejson-field-definitions
 [pnpm]: https://pnpm.io
+[npm]: https://npmjs.org
 [supported binaries]: #supported-package-managers
 [supported package manager]: #supported-package-managers
 [various flags]: https://github.com/nodejs/corepack#utility-commands
