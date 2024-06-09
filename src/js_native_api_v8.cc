@@ -1718,6 +1718,46 @@ napi_status NAPI_CDECL node_api_create_property_key_utf16(napi_env env,
   });
 }
 
+napi_status node_api_create_property_key_utf8(napi_env env,
+                                              const char* utf8name,
+                                              size_t length,
+                                              napi_value* result) {
+  if (env == nullptr || utf8name == nullptr || result == nullptr) {
+    return napi_invalid_arg;
+  }
+
+  v8::Isolate* isolate = reinterpret_cast<napi_env__*>(env)->isolate;
+  v8::HandleScope handle_scope(isolate);
+
+  v8::Local<v8::String> key;
+  if (!v8::String::NewFromUtf8(
+           isolate, utf8name, v8::NewStringType::kNormal, length)
+           .ToLocal(&key)) {
+    return napi_generic_failure;
+  }
+
+  *result = v8impl::JsValueFromV8LocalValue(key);
+  return napi_ok;
+}
+
+napi_status NAPI_CDECL node_api_set_named_property_len(napi_env env,
+                                                       napi_value object,
+                                                       const char* utf8name,
+                                                       size_t name_length,
+                                                       napi_value value) {
+  std::u16string utf16name;
+  napi_status status =
+      CHECK_NEW_FROM_UTF8_LEN(env, utf8name, name_length, &utf16name);
+  if (status != napi_ok) {
+    return status;
+  }
+
+  status = napi_set_named_property(
+      env, object, utf16name.data(), utf16name.length(), value);
+
+  return status;
+}
+
 napi_status NAPI_CDECL napi_create_double(napi_env env,
                                           double value,
                                           napi_value* result) {
