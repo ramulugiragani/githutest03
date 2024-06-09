@@ -132,7 +132,8 @@ class TTYTestCase(test.TestCase):
 class TTYTestConfiguration(test.TestConfiguration):
   def Ls(self, path):
     if isdir(path):
-        return [f[:-3] for f in os.listdir(path) if f.endswith('.js')]
+      return [f[:-3] for _0, _1, files in os.walk(path)
+              for f in files if f.endswith('.js')]
     else:
         return []
 
