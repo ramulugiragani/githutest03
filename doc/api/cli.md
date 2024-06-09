@@ -2328,7 +2328,8 @@ added:
 -->
 
 Set default [`tls.DEFAULT_MIN_VERSION`][] to 'TLSv1'. Use for compatibility with
-old TLS clients or servers.
+old TLS clients or servers. To support TLSv1 on the server, you will also need to
+set `--tls-cipher-list=DEFAULT@SECLEVEL=0`.
 
 ### `--tls-min-v1.1`
 
@@ -2339,7 +2340,8 @@ added:
 -->
 
 Set default [`tls.DEFAULT_MIN_VERSION`][] to 'TLSv1.1'. Use for compatibility
-with old TLS clients or servers.
+with old TLS clients or servers. To support TLSv1.1 on the server, you will also need to
+set `--tls-cipher-list=DEFAULT@SECLEVEL=0`.
 
 ### `--tls-min-v1.2`
 
