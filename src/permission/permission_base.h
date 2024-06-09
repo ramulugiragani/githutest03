@@ -28,12 +28,15 @@ namespace permission {
 
 #define INSPECTOR_PERMISSIONS(V) V(Inspector, "inspector", PermissionsRoot)
 
+#define NET_DNS_PERMISSIONS(V) V(NetDNS, "net.dns", PermissionsRoot)
+
 #define PERMISSIONS(V)                                                         \
   FILESYSTEM_PERMISSIONS(V)                                                    \
   CHILD_PROCESS_PERMISSIONS(V)                                                 \
   WASI_PERMISSIONS(V)                                                          \
   WORKER_THREADS_PERMISSIONS(V)                                                \
-  INSPECTOR_PERMISSIONS(V)
+  INSPECTOR_PERMISSIONS(V)                                                     \
+  NET_DNS_PERMISSIONS(V)
 
 #define V(name, _, __) k##name,
 enum class PermissionScope {
