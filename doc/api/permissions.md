@@ -575,6 +575,7 @@ There are constraints you need to know before using this system:
   * Inspector protocol
   * File system access
   * WASI
+  * DNS
 * The Permission Model is initialized after the Node.js environment is set up.
   However, certain flags such as `--env-file` or `--openssl-config` are designed
   to read files before environment initialization. As a result, such flags are

@@ -233,7 +233,6 @@ class QueryWrap final : public AsyncWrap {
       : AsyncWrap(channel->env(), req_wrap_obj, AsyncWrap::PROVIDER_QUERYWRAP),
         channel_(channel),
         trace_name_(Traits::name) {}
-
   ~QueryWrap() {
     CHECK_EQ(false, persistent().IsEmpty());
 

@@ -357,6 +357,48 @@ Error: Access to this API has been restricted
 }
 ```
 
+### `--allow-net-dns`
+
+<!-- YAML
+added: REPLACEME
+-->
+
+> Stability: 1.1 - Active development
+
+When using the [Permission Model][], the process will not be able to make dns query
+by default.
+Attempts to do so will throw an `ERR_ACCESS_DENIED` unless the
+user explicitly passes the `--allow-net-dns` flag when starting Node.js.
+
+Example:
+
+```js
+const dns = require('node:dns');
+dns.lookup("localhost", () => {});
+```
+
+```console
+$ node --experimental-permission --allow-fs-read=\* index.js
+node:dns:235
+  const err = cares.getaddrinfo(
+                    ^
+
+Error: Access to this API has been restricted
+    at Object.lookup (node:dns:235:21)
+    at Object.<anonymous> (/home/index.js:2:5)
+    at Module._compile (node:internal/modules/cjs/loader:1460:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1544:10)
+    at Module.load (node:internal/modules/cjs/loader:1275:32)
+    at Module._load (node:internal/modules/cjs/loader:1091:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:212:19)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:158:5)
+    at node:internal/main/run_main_module:30:49 {
+  code: 'ERR_ACCESS_DENIED',
+  permission: 'NetDNS',
+  resource: 'lookup'
+}
+```
+
 ### `--build-snapshot`
 
 <!-- YAML

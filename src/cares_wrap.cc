@@ -1417,6 +1417,8 @@ static void Query(const FunctionCallbackInfo<Value>& args) {
   node::Utf8Value utf8name(env->isolate(), string);
   auto plain_name = utf8name.ToStringView();
   std::string name = ada::idna::to_ascii(plain_name);
+  THROW_IF_INSUFFICIENT_PERMISSIONS(
+      env, permission::PermissionScope::kNetDNS, name);
   channel->ModifyActivityQueryCount(1);
   int err = wrap->Send(name.c_str());
   if (err) {
@@ -1428,7 +1430,6 @@ static void Query(const FunctionCallbackInfo<Value>& args) {
 
   args.GetReturnValue().Set(err);
 }
-
 
 void AfterGetAddrInfo(uv_getaddrinfo_t* req, int status, struct addrinfo* res) {
   auto cleanup = OnScopeLeave([&]() { uv_freeaddrinfo(res); });
@@ -1568,7 +1569,6 @@ void CanonicalizeIP(const FunctionCallbackInfo<Value>& args) {
 
 void GetAddrInfo(const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
-
   CHECK(args[0]->IsObject());
   CHECK(args[1]->IsString());
   CHECK(args[2]->IsInt32());
@@ -1576,7 +1576,8 @@ void GetAddrInfo(const FunctionCallbackInfo<Value>& args) {
   Local<Object> req_wrap_obj = args[0].As<Object>();
   node::Utf8Value hostname(env->isolate(), args[1]);
   std::string ascii_hostname = ada::idna::to_ascii(hostname.ToStringView());
-
+  THROW_IF_INSUFFICIENT_PERMISSIONS(
+      env, permission::PermissionScope::kNetDNS, ascii_hostname);
   int32_t flags = 0;
   if (args[3]->IsInt32()) {
     flags = args[3].As<Int32>()->Value();
@@ -1639,7 +1640,9 @@ void GetNameInfo(const FunctionCallbackInfo<Value>& args) {
   node::Utf8Value ip(env->isolate(), args[1]);
   const unsigned port = args[2]->Uint32Value(env->context()).FromJust();
   struct sockaddr_storage addr;
-
+  THROW_IF_INSUFFICIENT_PERMISSIONS(
+      env, permission::PermissionScope::kNetDNS,
+      (*ip + std::string(":") + std::to_string(port)));
   CHECK(uv_ip4_addr(*ip, port, reinterpret_cast<sockaddr_in*>(&addr)) == 0 ||
         uv_ip6_addr(*ip, port, reinterpret_cast<sockaddr_in6*>(&addr)) == 0);
 

@@ -464,6 +464,10 @@ EnvironmentOptionsParser::EnvironmentOptionsParser() {
             "allow worker threads when any permissions are set",
             &EnvironmentOptions::allow_worker_threads,
             kAllowedInEnvvar);
+  AddOption("--allow-net-dns",
+            "allow dns when any permissions are set",
+            &EnvironmentOptions::allow_net_dns,
+            kAllowedInEnvvar);
   AddOption("--experimental-repl-await",
             "experimental await keyword support in REPL",
             &EnvironmentOptions::experimental_repl_await,
